@@ -272,6 +272,16 @@ function DepartmentManagement({ user }) {
           })}
         </div>
       )}
+
+      {/* Department Detail Modal */}
+      {selectedDepartment && (
+        <DepartmentDetail
+          department={selectedDepartment}
+          onClose={() => setSelectedDepartment(null)}
+          onUpdate={handleDepartmentUpdate}
+          user={user}
+        />
+      )}
     </div>
   );
 }
