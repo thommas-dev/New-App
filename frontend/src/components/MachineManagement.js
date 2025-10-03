@@ -106,6 +106,19 @@ function MachineManagement({ user }) {
     ? machines.filter(machine => machine.department_id === filterDepartment)
     : machines;
 
+  const handleMachineClick = (machine) => {
+    setSelectedMachine(machine);
+  };
+
+  const handleMachineUpdate = (updatedMachine) => {
+    setMachines(prevMachines =>
+      prevMachines.map(machine =>
+        machine.id === updatedMachine.id ? updatedMachine : machine
+      )
+    );
+    setSelectedMachine(null);
+  };
+
   if (user.role !== 'Admin') {
     return (
       <div className="flex items-center justify-center h-96">
