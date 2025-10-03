@@ -58,6 +58,7 @@ function Dashboard({ user, onLogout }) {
             <Route path="/daily-tasks" element={<DailyTasks user={user} />} />
             <Route path="/departments" element={<DepartmentManagement user={user} />} />
             <Route path="/machines" element={<MachineManagement user={user} />} />
+            <Route path="/support" element={<Support user={user} />} />
           </Routes>
         </main>
       </div>
