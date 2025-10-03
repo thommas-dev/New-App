@@ -521,7 +521,7 @@ async def create_work_order(wo_data: WorkOrderCreate, current_user: User = Depen
     return work_order
 
 @api_router.get("/work-orders", response_model=List[WorkOrder])
-async def get_work_orders(current_user: User = Depends(get_current_user)):
+async def get_work_orders(current_user: User = Depends(get_current_user_with_access)):
     work_orders = await db.work_orders.find().sort("created_at", -1).to_list(length=None)
     
     # Migrate old "Backlog" status to "Scheduled"
