@@ -132,7 +132,7 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     }
   };
 
-  const addChecklistItem = () => {
+  const addChecklistItem = async () => {
     if (!newChecklistItem.trim()) return;
     
     const newItem = {
@@ -143,9 +143,25 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       created_by: user.username
     };
     
-    setChecklist(prev => [...prev, newItem]);
-    setNewChecklistItem('');
-    toast.success('Checklist item added');
+    const updatedChecklist = [...checklist, newItem];
+    
+    try {
+      setChecklist(updatedChecklist);
+      setNewChecklistItem('');
+      
+      // Auto-save to backend
+      await axios.put(`${API}/work-orders/${workOrder.id}`, {
+        checklist: updatedChecklist
+      });
+      
+      toast.success('Checklist item added');
+    } catch (error) {
+      console.error('Failed to add checklist item:', error);
+      // Revert on error
+      setChecklist(checklist);
+      setNewChecklistItem(newChecklistItem);
+      toast.error('Failed to add checklist item');
+    }
   };
 
   const removeChecklistItem = (itemId) => {
