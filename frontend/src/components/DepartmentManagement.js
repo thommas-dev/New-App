@@ -94,6 +94,19 @@ function DepartmentManagement({ user }) {
     return machines.filter(machine => machine.department_id === departmentId).length;
   };
 
+  const handleDepartmentClick = (department) => {
+    setSelectedDepartment(department);
+  };
+
+  const handleDepartmentUpdate = (updatedDepartment) => {
+    setDepartments(prevDepartments =>
+      prevDepartments.map(dept =>
+        dept.id === updatedDepartment.id ? updatedDepartment : dept
+      )
+    );
+    setSelectedDepartment(null);
+  };
+
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
