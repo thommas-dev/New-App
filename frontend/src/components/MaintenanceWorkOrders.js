@@ -273,7 +273,11 @@ function MaintenanceWorkOrders({ user }) {
         <CardContent className="p-6">
           <div className="space-y-4">
             {sampleMaintenanceTasks[activeView]?.map((task) => (
-              <Card key={task.id} className="border border-gray-200 hover:shadow-md transition-all duration-200">
+              <Card 
+                key={task.id} 
+                className="border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer"
+                onClick={() => handleTaskClick(task)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
@@ -303,6 +307,17 @@ function MaintenanceWorkOrders({ user }) {
                     </div>
                     <div className="flex items-center space-x-2">
                       {getStatusBadge(task.status)}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // Handle print individual task
+                        }}
+                        className="h-8 w-8 p-0 text-gray-500 hover:text-blue-600"
+                      >
+                        <Printer className="w-4 h-4" />
+                      </Button>
                     </div>
                   </div>
                   
@@ -313,12 +328,15 @@ function MaintenanceWorkOrders({ user }) {
                         Checklist ({task.checklist.length} items)
                       </p>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        {task.checklist.map((item, index) => (
+                        {task.checklist.slice(0, 2).map((item, index) => (
                           <li key={index} className="flex items-center">
                             <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                            {item}
+                            {typeof item === 'string' ? item : item.text}
                           </li>
                         ))}
+                        {task.checklist.length > 2 && (
+                          <li className="text-xs text-gray-500 ml-4">+{task.checklist.length - 2} more items</li>
+                        )}
                       </ul>
                     </div>
                   )}
