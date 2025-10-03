@@ -218,7 +218,7 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
               <SelectValue placeholder="Select assignee (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No assignee</SelectItem>
+              <SelectItem value="none">No assignee</SelectItem>
               {users.map(user => (
                 <SelectItem key={user.id} value={user.id}>
                   {user.username} ({user.role})
