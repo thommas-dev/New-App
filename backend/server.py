@@ -423,7 +423,7 @@ async def delete_department(dept_id: str, current_user: User = Depends(get_curre
 
 # Machine routes
 @api_router.post("/machines", response_model=Machine)
-async def create_machine(machine_data: MachineCreate, current_user: User = Depends(get_current_user)):
+async def create_machine(machine_data: MachineCreate, current_user: User = Depends(get_current_user_with_access)):
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only admins can create machines")
     
