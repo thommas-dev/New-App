@@ -52,6 +52,7 @@ function Dashboard({ user, onLogout }) {
 
         {/* Content area */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+          <TrialStatus />
           <Routes>
             <Route path="/" element={<KanbanBoard user={user} />} />
             <Route path="/maintenance" element={<MaintenanceWorkOrders user={user} />} />
