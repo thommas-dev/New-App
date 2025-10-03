@@ -21,6 +21,7 @@ import {
   FileText,
   CheckSquare,
   Edit3,
+  Printer,
   Save,
   Tag
 } from 'lucide-react';
