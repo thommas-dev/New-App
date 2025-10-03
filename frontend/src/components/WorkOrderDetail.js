@@ -146,8 +146,14 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   };
 
   const removeChecklistItem = (itemId) => {
-    setChecklist(prev => prev.filter(item => item.id !== itemId));
+    const updatedChecklist = checklist.filter(item => item.id !== itemId);
+    setChecklist(updatedChecklist);
     toast.success('Checklist item removed');
+    
+    // Update parent component immediately for percentage display
+    if (onUpdate) {
+      onUpdate({ ...workOrder, checklist: updatedChecklist });
+    }
   };
 
   const saveChecklistChanges = async () => {
