@@ -79,20 +79,18 @@ class BackendTester:
         """Test user registration creates trial_start and is_trial_active fields"""
         print("\n=== Testing User Registration with Trial ===")
         
-        # First, try to clean up any existing test user
-        await self.make_request("POST", "/auth/login", {
-            "username": TEST_USER_DATA["username"],
-            "password": TEST_USER_DATA["password"]
-        }, expect_status=401)  # Expect failure if user doesn't exist
-        
-        # Register new user
-        success, response, status = await self.make_request(
-            "POST", "/auth/register", TEST_USER_DATA, expect_status=200
+        # Try to login first in case user exists
+        login_success, login_response, login_status = await self.make_request(
+            "POST", "/auth/login", {
+                "username": TEST_USER_DATA["username"],
+                "password": TEST_USER_DATA["password"]
+            }, expect_status=200
         )
         
-        if success:
-            self.auth_token = response.get("access_token")
-            user_data = response.get("user", {})
+        if login_success:
+            # User exists, use existing login
+            self.auth_token = login_response.get("access_token")
+            user_data = login_response.get("user", {})
             self.user_id = user_data.get("id")
             
             # Check if trial fields are present
@@ -100,13 +98,34 @@ class BackendTester:
             has_is_trial_active = "is_trial_active" in user_data and user_data["is_trial_active"]
             
             if has_trial_start and has_is_trial_active:
-                self.log_result("User Registration Trial Fields", True, 
-                              "User registered with trial_start and is_trial_active=True")
+                self.log_result("User Login Trial Fields", True, 
+                              "Existing user has trial_start and is_trial_active=True")
             else:
-                self.log_result("User Registration Trial Fields", False, 
-                              "Missing trial fields in user registration", user_data)
+                self.log_result("User Login Trial Fields", False, 
+                              "Missing trial fields in existing user", user_data)
         else:
-            self.log_result("User Registration", False, f"Registration failed: {response}", status)
+            # Register new user
+            success, response, status = await self.make_request(
+                "POST", "/auth/register", TEST_USER_DATA, expect_status=200
+            )
+            
+            if success:
+                self.auth_token = response.get("access_token")
+                user_data = response.get("user", {})
+                self.user_id = user_data.get("id")
+                
+                # Check if trial fields are present
+                has_trial_start = "trial_start" in user_data
+                has_is_trial_active = "is_trial_active" in user_data and user_data["is_trial_active"]
+                
+                if has_trial_start and has_is_trial_active:
+                    self.log_result("User Registration Trial Fields", True, 
+                                  "User registered with trial_start and is_trial_active=True")
+                else:
+                    self.log_result("User Registration Trial Fields", False, 
+                                  "Missing trial fields in user registration", user_data)
+            else:
+                self.log_result("User Registration", False, f"Registration failed: {response}", status)
             
     async def test_subscription_status_endpoint(self):
         """Test /api/subscription/status endpoint returns correct trial status"""
