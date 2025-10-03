@@ -46,6 +46,8 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   const [checklist, setChecklist] = useState(workOrder.checklist || []);
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
+  const [checklistEditMode, setChecklistEditMode] = useState(false);
+  const [newChecklistItem, setNewChecklistItem] = useState('');
 
   useEffect(() => {
     fetchUsers();
