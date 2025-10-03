@@ -165,6 +165,7 @@ class WorkOrderUpdate(BaseModel):
     estimated_duration: Optional[int] = None
     description: Optional[str] = None
     tags: Optional[List[str]] = None
+    checklist: Optional[List[WorkOrderChecklistItem]] = None
 
 # Payment Models
 class PaymentTransaction(BaseModel):
