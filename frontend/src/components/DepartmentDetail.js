@@ -161,48 +161,26 @@ function DepartmentDetail({ department, onClose, onUpdate, user }) {
             </div>
             
             <div className="flex items-center space-x-2">
-              {user.role === 'Admin' && !editMode && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setEditMode(true)}
-                  data-testid="edit-department-btn"
-                >
-                  <Edit3 className="w-4 h-4 mr-2" />
-                  Edit
-                </Button>
-              )}
-              
-              {editMode && (
+              {user.role === 'Admin' && (
                 <Button
                   size="sm"
                   onClick={handleSave}
                   disabled={loading}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
                   data-testid="save-department-btn"
+                  className="bg-green-600 hover:bg-green-700 text-white"
                 >
-                  {loading ? (
-                    <div className="flex items-center space-x-2">
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>Saving...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <Save className="w-4 h-4 mr-2" />
-                      Save
-                    </>
-                  )}
+                  <Save className="w-4 h-4 mr-2" />
+                  {loading ? 'Saving...' : 'Save'}
                 </Button>
               )}
               
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
-                className="h-8 w-8 p-0"
-                data-testid="close-department-detail"
+                onClick={() => onClose()}
+                data-testid="close-department-modal"
               >
-                <X className="h-4 w-4" />
+                <X className="w-4 h-4" />
               </Button>
             </div>
           </div>
