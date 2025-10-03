@@ -17,6 +17,9 @@ import {
 
 function MaintenanceWorkOrders({ user }) {
   const [activeView, setActiveView] = useState('daily');
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [maintenanceTasks, setMaintenanceTasks] = useState(null);
 
   const maintenanceTypes = [
     {
