@@ -354,6 +354,30 @@ function MaintenanceWorkOrders({ user }) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Maintenance Task Detail Modal */}
+      {selectedTask && (
+        <MaintenanceTaskDetail
+          task={selectedTask}
+          onClose={() => setSelectedTask(null)}
+          onUpdate={handleTaskUpdate}
+          user={user}
+        />
+      )}
+
+      {/* Maintenance Task Form Modal */}
+      {showTaskForm && (
+        <MaintenanceTaskForm
+          type={maintenanceTasks?.type}
+          frequency={maintenanceTasks?.frequency}
+          onClose={() => {
+            setShowTaskForm(false);
+            setMaintenanceTasks(null);
+          }}
+          onCreate={handleTaskCreate}
+          user={user}
+        />
+      )}
     </div>
   );
 }
