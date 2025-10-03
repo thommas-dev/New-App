@@ -211,6 +211,41 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
+def check_trial_status(user: User) -> SubscriptionStatus:
+    """Check if user's trial is still active"""
+    if not user.trial_start:
+        return SubscriptionStatus(is_trial=False, trial_days_remaining=0, has_active_subscription=False)
+    
+    trial_end = user.trial_start + timedelta(days=14)  # 2-week trial
+    now = datetime.now(timezone.utc)
+    
+    if now > trial_end:
+        return SubscriptionStatus(is_trial=False, trial_days_remaining=0, has_active_subscription=False)
+    
+    days_remaining = (trial_end - now).days
+    return SubscriptionStatus(is_trial=True, trial_days_remaining=days_remaining, has_active_subscription=True)
+
+async def check_user_access(user: User) -> bool:
+    """Check if user has access (trial active or subscription)"""
+    # Check active subscription from payments
+    active_payment = await db.payment_transactions.find_one({
+        "user_id": user.id,
+        "payment_status": "paid",
+        "status": "completed"
+    }, sort=[("created_at", -1)])
+    
+    if active_payment:
+        # Check if subscription is still valid
+        package = PAYMENT_PACKAGES.get(active_payment["package_id"])
+        if package:
+            expiry_date = active_payment["updated_at"] + timedelta(days=package["duration_days"])
+            if datetime.now(timezone.utc) < expiry_date:
+                return True
+    
+    # Check trial status
+    trial_status = check_trial_status(user)
+    return trial_status.has_active_subscription
+
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
