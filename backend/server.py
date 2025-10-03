@@ -193,8 +193,12 @@ class SubscriptionStatus(BaseModel):
 
 # Payment packages configuration
 PAYMENT_PACKAGES = {
-    "monthly": {"amount": 29.99, "name": "Monthly Plan", "duration_days": 30},
-    "yearly": {"amount": 299.99, "name": "Yearly Plan", "duration_days": 365}
+    "starter_monthly": {"amount": 19.00, "name": "Starter Plan - Monthly", "duration_days": 30, "per_user": True, "features": ["Basic Work Orders", "Simple Kanban Board", "Basic Reports", "Email Support"]},
+    "starter_yearly": {"amount": 190.00, "name": "Starter Plan - Yearly", "duration_days": 365, "per_user": True, "savings": "17%", "features": ["Basic Work Orders", "Simple Kanban Board", "Basic Reports", "Email Support"]},
+    "professional_monthly": {"amount": 39.00, "name": "Professional Plan - Monthly", "duration_days": 30, "per_user": True, "features": ["All Starter Features", "Advanced Reporting", "Preventive Maintenance", "Custom Fields", "Priority Support"]},
+    "professional_yearly": {"amount": 390.00, "name": "Professional Plan - Yearly", "duration_days": 365, "per_user": True, "savings": "17%", "features": ["All Starter Features", "Advanced Reporting", "Preventive Maintenance", "Custom Fields", "Priority Support"]},
+    "enterprise_monthly": {"amount": 79.00, "name": "Enterprise Plan - Monthly", "duration_days": 30, "per_user": True, "features": ["All Professional Features", "API Access", "Custom Integrations", "Dedicated Support", "Training & Onboarding"]},
+    "enterprise_yearly": {"amount": 790.00, "name": "Enterprise Plan - Yearly", "duration_days": 365, "per_user": True, "savings": "17%", "features": ["All Professional Features", "API Access", "Custom Integrations", "Dedicated Support", "Training & Onboarding"]}
 }
 
 # Helper functions
