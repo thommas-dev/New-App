@@ -286,7 +286,11 @@ function MachineManagement({ user }) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredMachines.map((machine) => {
             return (
-              <Card key={machine.id} className="hover:shadow-lg transition-all duration-200 card-animation border-0 shadow-sm">
+              <Card 
+              key={machine.id} 
+              className="hover:shadow-lg transition-all duration-200 card-animation border-0 shadow-sm cursor-pointer"
+              onClick={() => handleMachineClick(machine)}
+            >
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
