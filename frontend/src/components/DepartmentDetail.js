@@ -55,7 +55,6 @@ function DepartmentDetail({ department, onClose, onUpdate, user }) {
       });
       
       toast.success('Department updated successfully!');
-      setEditMode(false);
       
       if (onUpdate) {
         onUpdate({ ...department, ...departmentData });
