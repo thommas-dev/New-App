@@ -19,6 +19,7 @@ import {
 
 function DailyTasks({ user }) {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [selectedTask, setSelectedTask] = useState(null);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
