@@ -102,34 +102,20 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     }
   };
 
-  const handleChecklistToggle = async (itemId, completed) => {
-    try {
-      // Update local state immediately for responsiveness
-      const updatedChecklist = checklist.map(item => 
-        item.id === itemId 
-          ? { 
-              ...item, 
-              completed, 
-              completed_by: completed ? user.username : null,
-              completed_at: completed ? new Date().toISOString() : null
-            } 
-          : item
-      );
-      
-      setChecklist(updatedChecklist);
-      
-      // Auto-save to backend
-      await axios.put(`${API}/work-orders/${workOrder.id}`, {
-        checklist: updatedChecklist
-      });
-      
-      toast.success(`Checklist item ${completed ? 'completed' : 'unchecked'}`);
-    } catch (error) {
-      console.error('Failed to update checklist:', error);
-      // Revert the change on error
-      setChecklist(checklist);
-      toast.error('Failed to update checklist - changes reverted');
-    }
+  const handleChecklistToggle = (itemId, completed) => {
+    // Update local state only (no auto-save)
+    const updatedChecklist = checklist.map(item => 
+      item.id === itemId 
+        ? { 
+            ...item, 
+            completed, 
+            completed_by: completed ? user.username : null,
+            completed_at: completed ? new Date().toISOString() : null
+          } 
+        : item
+    );
+    
+    setChecklist(updatedChecklist);
   };
 
   const addChecklistItem = async () => {
