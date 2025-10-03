@@ -436,6 +436,16 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
               )}
               
               <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrint}
+                data-testid="print-work-order-btn"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                Print
+              </Button>
+              
+              <Button
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
