@@ -275,7 +275,7 @@ function Login({ onLogin }) {
         </Card>
 
         <div className="text-center mt-6 text-sm text-gray-500">
-          Start your 30-day free trial today
+          Start your 14-day free trial today
         </div>
       </div>
     </div>
