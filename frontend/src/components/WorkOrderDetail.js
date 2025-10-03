@@ -300,7 +300,6 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="Backlog">Backlog</SelectItem>
                             <SelectItem value="Scheduled">Scheduled</SelectItem>
                             <SelectItem value="In Progress">In Progress</SelectItem>
                             <SelectItem value="Completed">Completed</SelectItem>
