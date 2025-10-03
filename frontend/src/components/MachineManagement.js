@@ -100,7 +100,7 @@ function MachineManagement({ user }) {
   };
 
   // Filter machines by department
-  const filteredMachines = filterDepartment 
+  const filteredMachines = filterDepartment && filterDepartment !== 'all'
     ? machines.filter(machine => machine.department_id === filterDepartment)
     : machines;
 
