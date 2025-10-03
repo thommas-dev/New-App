@@ -349,7 +349,7 @@ function KanbanBoard({ user }) {
                               <div className="flex items-center justify-between text-xs">
                                 <div className="flex items-center text-gray-600">
                                   <CheckSquare className="w-3 h-3 mr-1" />
-                                  Checklist {completed}/{total}
+                                  Checklist {completed}/{total} ({Math.round((completed / total) * 100)}%)
                                 </div>
                                 <div className="w-16 bg-gray-200 rounded-full h-1.5">
                                   <div 
