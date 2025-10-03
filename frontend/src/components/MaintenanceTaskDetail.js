@@ -263,7 +263,7 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     setChecklist(updatedChecklist);
   };
 
-  const addChecklistItem = async () => {
+  const addChecklistItem = () => {
     if (!newChecklistItem.trim()) return;
     
     const newItem = {
@@ -274,46 +274,23 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
       created_by: user.username
     };
     
-    const updatedChecklist = [...checklist, newItem];
-    
-    try {
-      setChecklist(updatedChecklist);
-      setNewChecklistItem('');
-      
-      // Auto-save to backend (simulated for maintenance tasks)
-      toast.success('Checklist item added');
-      
-      // Update parent component if callback provided
-      if (onUpdate) {
-        onUpdate({ ...task, checklist: updatedChecklist });
-      }
-    } catch (error) {
-      console.error('Failed to add checklist item:', error);
-      // Revert on error
-      setChecklist(checklist);
-      setNewChecklistItem(newChecklistItem);
-      toast.error('Failed to add checklist item');
-    }
+    setChecklist(prev => [...prev, newItem]);
+    setNewChecklistItem('');
+    toast.success('Checklist item added');
   };
 
-  const removeChecklistItem = async (itemId) => {
-    const updatedChecklist = checklist.filter(item => item.id !== itemId);
+  const removeChecklistItem = (itemId) => {
+    setChecklist(prev => prev.filter(item => item.id !== itemId));
+    toast.success('Checklist item removed');
+  };
+
+  const saveChecklistChanges = () => {
+    // Save checklist changes manually
+    toast.success('Checklist saved successfully!');
     
-    try {
-      setChecklist(updatedChecklist);
-      
-      // Auto-save to backend (simulated for maintenance tasks)
-      toast.success('Checklist item removed');
-      
-      // Update parent component if callback provided
-      if (onUpdate) {
-        onUpdate({ ...task, checklist: updatedChecklist });
-      }
-    } catch (error) {
-      console.error('Failed to remove checklist item:', error);
-      // Revert on error
-      setChecklist(checklist);
-      toast.error('Failed to remove checklist item');
+    // Update parent component if callback provided
+    if (onUpdate) {
+      onUpdate({ ...task, checklist });
     }
   };
 
