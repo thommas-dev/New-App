@@ -33,6 +33,14 @@ axios.interceptors.response.use(
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       window.location.href = '/login';
+    } else if (error.response?.status === 403) {
+      // Handle trial expired or access denied
+      if (error.response?.data?.detail?.includes('trial has expired') || 
+          error.response?.data?.detail?.includes('Access denied')) {
+        toast.error('Your trial has expired. Please subscribe to continue.');
+        window.location.href = '/pricing';
+        return Promise.reject(error);
+      }
     }
     return Promise.reject(error);
   }
