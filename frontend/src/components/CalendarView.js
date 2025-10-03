@@ -140,6 +140,15 @@ function CalendarView({ user }) {
     return colors[status] || 'bg-gray-500';
   };
 
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+  };
+
+  const handleTaskUpdate = (updatedTask) => {
+    // In a full implementation, you'd update the task in the state
+    setSelectedTask(null);
+  };
+
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
