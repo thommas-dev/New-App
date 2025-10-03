@@ -263,7 +263,17 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     user = await db.users.find_one({"username": username})
     if user is None:
         raise credentials_exception
-    return User(**user)
+    return User(**parse_from_mongo(user))
+
+async def get_current_user_with_access(current_user: User = Depends(get_current_user)):
+    """Get current user and verify they have access"""
+    has_access = await check_user_access(current_user)
+    if not has_access:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. Your trial has expired. Please subscribe to continue using the service."
+        )
+    return current_user
 
 async def generate_wo_id():
     """Generate next WO ID in format WO-2025-0001"""
