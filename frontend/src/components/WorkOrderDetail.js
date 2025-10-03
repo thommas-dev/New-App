@@ -134,9 +134,15 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       created_by: user.username
     };
     
-    setChecklist(prev => [...prev, newItem]);
+    const updatedChecklist = [...checklist, newItem];
+    setChecklist(updatedChecklist);
     setNewChecklistItem('');
     toast.success('Checklist item added');
+    
+    // Update parent component immediately for percentage display
+    if (onUpdate) {
+      onUpdate({ ...workOrder, checklist: updatedChecklist });
+    }
   };
 
   const removeChecklistItem = (itemId) => {
