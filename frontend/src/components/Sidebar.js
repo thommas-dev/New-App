@@ -60,6 +60,12 @@ function Sidebar({ user, onLogout, onCloseSidebar }) {
       icon: Settings,
       description: 'Manage machines',
       adminOnly: true
+    },
+    {
+      path: '/support',
+      label: 'Support',
+      icon: HelpCircle,
+      description: 'Help & user manual'
     }
   ];
 
