@@ -445,7 +445,7 @@ async def create_machine(machine_data: MachineCreate, current_user: User = Depen
     return machine
 
 @api_router.get("/machines", response_model=List[Machine])
-async def get_machines(department_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
+async def get_machines(department_id: Optional[str] = None, current_user: User = Depends(get_current_user_with_access)):
     query = {}
     if department_id:
         query["department_id"] = department_id
