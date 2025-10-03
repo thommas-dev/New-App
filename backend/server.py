@@ -44,7 +44,6 @@ class WorkOrderType(str, Enum):
     REPAIR = "Repair"
 
 class WorkOrderStatus(str, Enum):
-    BACKLOG = "Backlog"
     SCHEDULED = "Scheduled"
     IN_PROGRESS = "In Progress"
     COMPLETED = "Completed"
