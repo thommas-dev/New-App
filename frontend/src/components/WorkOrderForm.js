@@ -96,6 +96,9 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
     try {
       const submitData = {
         ...formData,
+        assignee: formData.assignee === 'none' ? null : formData.assignee,
+        department_id: formData.department_id === 'none' ? null : formData.department_id,
+        machine_id: formData.machine_id === 'none' ? null : formData.machine_id,
         estimated_duration: formData.estimated_duration ? parseInt(formData.estimated_duration) : null,
         due_date: formData.due_date || null,
         scheduled_start: formData.scheduled_start || null,
