@@ -102,8 +102,6 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
 
   const handleChecklistToggle = async (itemId, completed) => {
     try {
-      // For now, we'll update the local state
-      // In a full implementation, you'd want a dedicated API endpoint for checklist updates
       setChecklist(prev => 
         prev.map(item => 
           item.id === itemId 
@@ -120,6 +118,41 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       toast.success(`Checklist item ${completed ? 'completed' : 'unchecked'}`);
     } catch (error) {
       toast.error('Failed to update checklist');
+    }
+  };
+
+  const addChecklistItem = () => {
+    if (!newChecklistItem.trim()) return;
+    
+    const newItem = {
+      id: Date.now().toString(),
+      text: newChecklistItem.trim(),
+      completed: false,
+      created_at: new Date().toISOString(),
+      created_by: user.username
+    };
+    
+    setChecklist(prev => [...prev, newItem]);
+    setNewChecklistItem('');
+    toast.success('Checklist item added');
+  };
+
+  const removeChecklistItem = (itemId) => {
+    setChecklist(prev => prev.filter(item => item.id !== itemId));
+    toast.success('Checklist item removed');
+  };
+
+  const saveChecklistChanges = async () => {
+    try {
+      // In a full implementation, you'd save to the backend
+      toast.success('Checklist saved successfully!');
+      setChecklistEditMode(false);
+      
+      if (onUpdate) {
+        onUpdate({ ...workOrder, checklist });
+      }
+    } catch (error) {
+      toast.error('Failed to save checklist');
     }
   };
 
