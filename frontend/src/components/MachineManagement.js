@@ -342,6 +342,16 @@ function MachineManagement({ user }) {
           })}
         </div>
       )}
+
+      {/* Machine Detail Modal */}
+      {selectedMachine && (
+        <MachineDetail
+          machine={selectedMachine}
+          onClose={() => setSelectedMachine(null)}
+          onUpdate={handleMachineUpdate}
+          user={user}
+        />
+      )}
     </div>
   );
 }
