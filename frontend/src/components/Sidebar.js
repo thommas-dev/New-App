@@ -23,9 +23,27 @@ function Sidebar({ user, onLogout, onCloseSidebar }) {
   const menuItems = [
     {
       path: '/',
-      label: 'Kanban Board',
+      label: 'Repair Work Orders',
       icon: LayoutDashboard,
-      description: 'Work orders overview'
+      description: 'Repair work orders board'
+    },
+    {
+      path: '/maintenance',
+      label: 'Maintenance Work Orders',
+      icon: Settings,
+      description: 'Scheduled maintenance'
+    },
+    {
+      path: '/calendar',
+      label: 'Calendar',
+      icon: Calendar,
+      description: 'View scheduled tasks'
+    },
+    {
+      path: '/daily-tasks',
+      label: 'Daily Tasks',
+      icon: Clock,
+      description: 'Today\'s notifications'
     },
     {
       path: '/departments',
