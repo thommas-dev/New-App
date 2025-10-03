@@ -406,7 +406,7 @@ async def get_departments(current_user: User = Depends(get_current_user_with_acc
     return [Department(**parse_from_mongo(dept)) for dept in departments]
 
 @api_router.delete("/departments/{dept_id}")
-async def delete_department(dept_id: str, current_user: User = Depends(get_current_user)):
+async def delete_department(dept_id: str, current_user: User = Depends(get_current_user_with_access)):
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only admins can delete departments")
     
