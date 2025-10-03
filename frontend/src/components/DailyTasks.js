@@ -390,6 +390,27 @@ function DailyTasks({ user }) {
           </div>
         </div>
       </div>
+
+      {/* Task Detail Modal */}
+      {selectedTask && (
+        <>
+          {selectedTask.type === 'maintenance' ? (
+            <MaintenanceTaskDetail
+              task={selectedTask}
+              onClose={() => setSelectedTask(null)}
+              onUpdate={handleTaskUpdate}
+              user={user}
+            />
+          ) : (
+            <WorkOrderDetail
+              workOrder={selectedTask}
+              onClose={() => setSelectedTask(null)}
+              onUpdate={handleTaskUpdate}
+              user={user}
+            />
+          )}
+        </>
+      )}
     </div>
   );
 }
