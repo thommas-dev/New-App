@@ -13,9 +13,10 @@ from typing import Dict, Any, Optional
 
 # Configuration
 BASE_URL = "https://pmtool.preview.emergentagent.com/api"
+TIMESTAMP = str(int(time.time()))
 TEST_USER_DATA = {
-    "username": "trial_test_user_2025",
-    "email": "trial_test@equiptrack.com", 
+    "username": f"trial_test_user_{TIMESTAMP}",
+    "email": f"trial_test_{TIMESTAMP}@equiptrack.com", 
     "password": "SecureTestPass123!",
     "role": "Admin"
 }
