@@ -278,7 +278,7 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
                 <SelectValue placeholder={formData.department_id ? "Select machine" : "Select department first"} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No specific machine</SelectItem>
+                <SelectItem value="none">No specific machine</SelectItem>
                 {machines.map(machine => (
                   <SelectItem key={machine.id} value={machine.id}>
                     {machine.name}
