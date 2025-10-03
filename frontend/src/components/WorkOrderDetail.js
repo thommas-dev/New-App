@@ -134,24 +134,9 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     toast.success('Checklist item added');
   };
 
-  const removeChecklistItem = async (itemId) => {
-    const updatedChecklist = checklist.filter(item => item.id !== itemId);
-    
-    try {
-      setChecklist(updatedChecklist);
-      
-      // Auto-save to backend
-      await axios.put(`${API}/work-orders/${workOrder.id}`, {
-        checklist: updatedChecklist
-      });
-      
-      toast.success('Checklist item removed');
-    } catch (error) {
-      console.error('Failed to remove checklist item:', error);
-      // Revert on error
-      setChecklist(checklist);
-      toast.error('Failed to remove checklist item');
-    }
+  const removeChecklistItem = (itemId) => {
+    setChecklist(prev => prev.filter(item => item.id !== itemId));
+    toast.success('Checklist item removed');
   };
 
   const saveChecklistChanges = async () => {
