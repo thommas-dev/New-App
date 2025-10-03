@@ -375,7 +375,7 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 
 # Department routes
 @api_router.post("/departments", response_model=Department)
-async def create_department(dept_data: DepartmentCreate, current_user: User = Depends(get_current_user)):
+async def create_department(dept_data: DepartmentCreate, current_user: User = Depends(get_current_user_with_access)):
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only admins can create departments")
     
