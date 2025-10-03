@@ -568,7 +568,7 @@ async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user
     return WorkOrder(**parse_from_mongo(updated_wo))
 
 @api_router.delete("/work-orders/{wo_id}")
-async def delete_work_order(wo_id: str, current_user: User = Depends(get_current_user)):
+async def delete_work_order(wo_id: str, current_user: User = Depends(get_current_user_with_access)):
     result = await db.work_orders.delete_one({"id": wo_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Work order not found")
