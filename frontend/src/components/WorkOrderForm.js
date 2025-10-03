@@ -260,10 +260,7 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
                 <SelectItem value="">No department</SelectItem>
                 {departments.map(dept => (
                   <SelectItem key={dept.id} value={dept.id}>
-                    <div className="flex items-center space-x-2">
-                      <Building2 className="w-4 h-4" />
-                      <span>{dept.name}</span>
-                    </div>
+                    {dept.name}
                   </SelectItem>
                 ))}
               </SelectContent>
