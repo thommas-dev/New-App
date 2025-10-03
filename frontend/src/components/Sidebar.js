@@ -8,6 +8,7 @@ import {
   LogOut, 
   Clock, 
   Calendar,
+  HelpCircle,
   Settings as SettingsIcon,
   Users
 } from 'lucide-react';
