@@ -670,7 +670,7 @@ async def get_payment_status(session_id: str, current_user: User = Depends(get_c
     
     # Check with Stripe
     stripe_api_key = os.environ.get('STRIPE_SECRET_KEY')
-    webhook_url = f"dummy_url"  # Not used for status check
+    webhook_url = "dummy_url"  # Not used for status check
     stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
     
     try:
