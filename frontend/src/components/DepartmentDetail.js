@@ -137,7 +137,7 @@ function DepartmentDetail({ department, onClose, onUpdate, user }) {
                   <Building2 className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  {editMode ? (
+                  {user.role === 'Admin' ? (
                     <Input
                       value={departmentData.name}
                       onChange={(e) => setDepartmentData(prev => ({ ...prev, name: e.target.value }))}
