@@ -131,8 +131,38 @@ function MaintenanceWorkOrders({ user }) {
   });
 
   const handleCreateMaintenance = (type) => {
-    // This would open a modal to create new maintenance tasks
-    console.log(`Creating ${type} maintenance task`);
+    setMaintenanceTasks({ type, frequency: type.charAt(0).toUpperCase() + type.slice(1) });
+    setShowTaskForm(true);
+  };
+
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+  };
+
+  const handleTaskUpdate = (updatedTask) => {
+    setSampleMaintenanceTasks(prev => ({
+      ...prev,
+      [activeView]: prev[activeView].map(task =>
+        task.id === updatedTask.id ? updatedTask : task
+      )
+    }));
+    setSelectedTask(null);
+  };
+
+  const handleTaskCreate = (newTask) => {
+    const taskWithId = {
+      ...newTask,
+      id: Date.now(),
+      status: 'pending'
+    };
+    
+    setSampleMaintenanceTasks(prev => ({
+      ...prev,
+      [maintenanceTasks.type]: [...(prev[maintenanceTasks.type] || []), taskWithId]
+    }));
+    
+    setShowTaskForm(false);
+    setMaintenanceTasks(null);
   };
 
   const getStatusBadge = (status) => {
