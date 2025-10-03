@@ -281,10 +281,7 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
                 <SelectItem value="">No specific machine</SelectItem>
                 {machines.map(machine => (
                   <SelectItem key={machine.id} value={machine.id}>
-                    <div className="flex items-center space-x-2">
-                      <Settings className="w-4 h-4" />
-                      <span>{machine.name}</span>
-                    </div>
+                    {machine.name}
                   </SelectItem>
                 ))}
               </SelectContent>
