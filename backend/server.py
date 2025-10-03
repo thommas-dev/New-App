@@ -460,7 +460,7 @@ async def delete_machine(machine_id: str, current_user: User = Depends(get_curre
 
 # Work Order routes
 @api_router.post("/work-orders", response_model=WorkOrder)
-async def create_work_order(wo_data: WorkOrderCreate, current_user: User = Depends(get_current_user)):
+async def create_work_order(wo_data: WorkOrderCreate, current_user: User = Depends(get_current_user_with_access)):
     wo_id = await generate_wo_id()
     
     # Get department and machine names if provided
