@@ -20,7 +20,7 @@ function Header({ user, onMenuClick, onCreateWorkOrder }) {
           
           <div>
             <h1 className="text-2xl font-semibold text-gray-900">
-              Maintenance Dashboard
+              Maintenance and Repair Dashboard
             </h1>
             <p className="text-sm text-gray-500">
               Manage work orders and preventive maintenance
