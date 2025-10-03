@@ -27,6 +27,7 @@ function MachineManagement({ user }) {
   const [newMachine, setNewMachine] = useState({ name: '', department_id: '' });
   const [creating, setCreating] = useState(false);
   const [filterDepartment, setFilterDepartment] = useState('');
+  const [selectedMachine, setSelectedMachine] = useState(null);
 
   const fetchMachines = async () => {
     try {
