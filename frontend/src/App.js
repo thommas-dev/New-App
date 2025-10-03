@@ -102,6 +102,30 @@ function App() {
             } 
           />
           <Route 
+            path="/pricing" 
+            element={
+              user ? (
+                <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+                  <Pricing />
+                </div>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+          <Route 
+            path="/payment-success" 
+            element={
+              user ? (
+                <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+                  <PaymentSuccess />
+                </div>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+          <Route 
             path="/*" 
             element={
               user ? (
