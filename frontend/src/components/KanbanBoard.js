@@ -157,6 +157,19 @@ function KanbanBoard({ user }) {
     return filteredWorkOrders.filter(wo => wo.status === columnId);
   };
 
+  const handleWorkOrderClick = (workOrder) => {
+    setSelectedWorkOrder(workOrder);
+  };
+
+  const handleWorkOrderUpdate = (updatedWorkOrder) => {
+    setWorkOrders(prevOrders =>
+      prevOrders.map(wo =>
+        wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo
+      )
+    );
+    setSelectedWorkOrder(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
