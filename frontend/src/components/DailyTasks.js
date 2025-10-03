@@ -108,7 +108,12 @@ function DailyTasks({ user }) {
         { id: '4-3', text: 'Verify safety protocols', completed: false, created_by: 'System', created_at: new Date().toISOString() }
       ]
     }
-  ];
+  ]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
 
   const getTasksByStatus = () => {
     const pending = todaysTasks.filter(task => task.status === 'pending');
