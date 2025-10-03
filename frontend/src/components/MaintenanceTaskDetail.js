@@ -298,6 +298,60 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     }
   };
 
+  const addChecklistItem = async () => {
+    if (!newChecklistItem.trim()) return;
+    
+    const newItem = {
+      id: Date.now().toString(),
+      text: newChecklistItem.trim(),
+      completed: false,
+      created_at: new Date().toISOString(),
+      created_by: user.username
+    };
+    
+    const updatedChecklist = [...checklist, newItem];
+    
+    try {
+      setChecklist(updatedChecklist);
+      setNewChecklistItem('');
+      
+      // Auto-save to backend (simulated for maintenance tasks)
+      toast.success('Checklist item added');
+      
+      // Update parent component if callback provided
+      if (onUpdate) {
+        onUpdate({ ...task, checklist: updatedChecklist });
+      }
+    } catch (error) {
+      console.error('Failed to add checklist item:', error);
+      // Revert on error
+      setChecklist(checklist);
+      setNewChecklistItem(newChecklistItem);
+      toast.error('Failed to add checklist item');
+    }
+  };
+
+  const removeChecklistItem = async (itemId) => {
+    const updatedChecklist = checklist.filter(item => item.id !== itemId);
+    
+    try {
+      setChecklist(updatedChecklist);
+      
+      // Auto-save to backend (simulated for maintenance tasks)
+      toast.success('Checklist item removed');
+      
+      // Update parent component if callback provided
+      if (onUpdate) {
+        onUpdate({ ...task, checklist: updatedChecklist });
+      }
+    } catch (error) {
+      console.error('Failed to remove checklist item:', error);
+      // Revert on error
+      setChecklist(checklist);
+      toast.error('Failed to remove checklist item');
+    }
+  };
+
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
