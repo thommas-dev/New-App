@@ -54,7 +54,7 @@ function MaintenanceWorkOrders({ user }) {
     }
   ];
 
-  const sampleMaintenanceTasks = {
+  const [sampleMaintenanceTasks, setSampleMaintenanceTasks] = useState({
     daily: [
       {
         id: 1,
@@ -62,8 +62,16 @@ function MaintenanceWorkOrders({ user }) {
         department: 'Production',
         machine: 'CNC Machine 01',
         time: '08:00',
+        frequency: 'Daily',
+        priority: 'High',
         status: 'pending',
-        checklist: ['Check oil level', 'Record readings', 'Top up if needed']
+        notes: 'Check hydraulic oil levels and record readings. Top up if below minimum line.',
+        safety_notes: 'Ensure machine is powered off before checking oil levels.',
+        checklist: [
+          { id: '1-1', text: 'Check oil level', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '1-2', text: 'Record readings', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '1-3', text: 'Top up if needed', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+        ]
       },
       {
         id: 2,
@@ -71,8 +79,16 @@ function MaintenanceWorkOrders({ user }) {
         department: 'Production',
         machine: 'Conveyor Belt A',
         time: '14:00',
+        frequency: 'Daily',
+        priority: 'Medium',
         status: 'completed',
-        checklist: ['Visual inspection', 'Check tension', 'Clean belt surface']
+        notes: 'Daily visual inspection of conveyor belt system for wear and proper operation.',
+        safety_notes: 'Use lockout/tagout procedures before inspection.',
+        checklist: [
+          { id: '2-1', text: 'Visual inspection', completed: true, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '2-2', text: 'Check tension', completed: true, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '2-3', text: 'Clean belt surface', completed: true, created_by: 'System', created_at: new Date().toISOString() }
+        ]
       }
     ],
     weekly: [
@@ -81,9 +97,16 @@ function MaintenanceWorkOrders({ user }) {
         title: 'Filter Replacement - Air Compressor',
         department: 'Utilities',
         machine: 'Air Compressor Unit 1',
-        frequency: 'Every Monday',
+        frequency: 'Weekly',
+        priority: 'Medium',
         status: 'scheduled',
-        checklist: ['Turn off compressor', 'Replace air filter', 'Check pressure settings']
+        notes: 'Replace air intake filter and check system pressure.',
+        safety_notes: 'Depressurize system before filter replacement.',
+        checklist: [
+          { id: '3-1', text: 'Turn off compressor', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '3-2', text: 'Replace air filter', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '3-3', text: 'Check pressure settings', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+        ]
       }
     ],
     monthly: [
@@ -92,12 +115,20 @@ function MaintenanceWorkOrders({ user }) {
         title: 'Comprehensive HVAC Inspection',
         department: 'Facilities',
         machine: 'HVAC System',
-        frequency: 'First Monday of month',
+        frequency: 'Monthly',
+        priority: 'High',
         status: 'pending',
-        checklist: ['Check all filters', 'Inspect ductwork', 'Test thermostats', 'Clean coils']
+        notes: 'Complete monthly inspection of HVAC system including all components.',
+        safety_notes: 'Turn off power to units before inspection. Watch for electrical hazards.',
+        checklist: [
+          { id: '4-1', text: 'Check all filters', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '4-2', text: 'Inspect ductwork', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '4-3', text: 'Test thermostats', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+          { id: '4-4', text: 'Clean coils', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+        ]
       }
     ]
-  };
+  });
 
   const handleCreateMaintenance = (type) => {
     // This would open a modal to create new maintenance tasks
