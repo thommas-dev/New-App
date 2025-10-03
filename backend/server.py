@@ -114,7 +114,7 @@ class WorkOrder(BaseModel):
     title: str
     type: WorkOrderType
     priority: Priority
-    status: WorkOrderStatus = WorkOrderStatus.BACKLOG
+    status: WorkOrderStatus = WorkOrderStatus.SCHEDULED
     assignee: Optional[str] = None
     assignee_name: Optional[str] = None
     requested_by: str
