@@ -256,11 +256,11 @@ function DailyTasks({ user }) {
                   <div key={index} className="flex items-center space-x-2">
                     <Checkbox 
                       size="sm" 
-                      checked={task.status === 'completed'}
+                      checked={task.status === 'completed' || (typeof item === 'object' && item.completed)}
                       disabled={task.status === 'completed'}
                     />
                     <span className={`text-xs ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-700'}`}>
-                      {item}
+                      {typeof item === 'string' ? item : (item?.text || item)}
                     </span>
                   </div>
                 ))}
