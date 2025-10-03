@@ -8,6 +8,7 @@ import MachineManagement from './MachineManagement';
 import MaintenanceWorkOrders from './MaintenanceWorkOrders';
 import CalendarView from './CalendarView';
 import DailyTasks from './DailyTasks';
+import Support from './Support';
 import WorkOrderForm from './WorkOrderForm';
 import { Button } from '@/components/ui/button';
 import { Plus, Menu, X } from 'lucide-react';
