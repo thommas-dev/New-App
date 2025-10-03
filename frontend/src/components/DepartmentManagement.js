@@ -25,6 +25,7 @@ function DepartmentManagement({ user }) {
   const [loading, setLoading] = useState(true);
   const [newDepartmentName, setNewDepartmentName] = useState('');
   const [creating, setCreating] = useState(false);
+  const [selectedDepartment, setSelectedDepartment] = useState(null);
 
   const fetchDepartments = async () => {
     try {
