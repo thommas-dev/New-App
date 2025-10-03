@@ -240,7 +240,10 @@ function DepartmentManagement({ user }) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteDepartment(department.id, department.name)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteDepartment(department.id, department.name);
+                      }}
                       className="text-red-600 hover:text-red-700 hover:bg-red-50 h-8 w-8 p-0"
                       data-testid={`delete-department-${department.id}`}
                     >
