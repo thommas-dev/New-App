@@ -654,7 +654,7 @@ async def create_checkout_session(request: PaymentPackageRequest, current_user: 
             session_id=session.session_id,
             user_id=current_user.id,
             email=current_user.email,
-            amount=package["amount"],
+            amount=total_amount,
             package_id=request.package_id,
             metadata=checkout_request.metadata or {}
         )
