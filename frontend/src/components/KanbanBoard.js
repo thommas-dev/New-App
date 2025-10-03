@@ -185,7 +185,7 @@ function KanbanBoard({ user }) {
           <div>
             <h2 className="text-2xl font-semibold text-gray-900">Work Orders Board</h2>
             <p className="text-gray-600 mt-1">
-              {filteredWorkOrders.length} work orders • Drag and drop to update status
+              {filteredWorkOrders.length} work orders
             </p>
           </div>
           
