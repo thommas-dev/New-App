@@ -397,6 +397,16 @@ function KanbanBoard({ user }) {
           );
         })}
       </div>
+
+      {/* Work Order Detail Modal */}
+      {selectedWorkOrder && (
+        <WorkOrderDetail
+          workOrder={selectedWorkOrder}
+          onClose={() => setSelectedWorkOrder(null)}
+          onUpdate={handleWorkOrderUpdate}
+          user={user}
+        />
+      )}
     </div>
   );
 }
