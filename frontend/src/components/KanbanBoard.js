@@ -196,7 +196,7 @@ function KanbanBoard({ user }) {
                 </div>
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">All Departments</SelectItem>
+                <SelectItem value="all">All Departments</SelectItem>
                 {departments.map(dept => (
                   <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
                 ))}
