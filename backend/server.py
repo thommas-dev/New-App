@@ -166,6 +166,37 @@ class WorkOrderUpdate(BaseModel):
     description: Optional[str] = None
     tags: Optional[List[str]] = None
 
+# Payment Models
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_id: str
+    user_id: str
+    email: str
+    amount: float
+    currency: str = "usd"
+    payment_status: str = "pending"  # pending, paid, failed, expired
+    status: str = "initiated"  # initiated, completed, expired
+    package_id: str
+    metadata: Dict[str, str] = {}
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PaymentPackageRequest(BaseModel):
+    package_id: str
+    origin_url: str
+
+class SubscriptionStatus(BaseModel):
+    is_trial: bool
+    trial_days_remaining: int
+    has_active_subscription: bool
+    subscription_type: Optional[str] = None
+
+# Payment packages configuration
+PAYMENT_PACKAGES = {
+    "monthly": {"amount": 29.99, "name": "Monthly Plan", "duration_days": 30},
+    "yearly": {"amount": 299.99, "name": "Yearly Plan", "duration_days": 365}
+}
+
 # Helper functions
 def create_access_token(data: dict):
     to_encode = data.copy()
