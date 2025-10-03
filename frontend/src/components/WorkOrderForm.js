@@ -257,7 +257,7 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
                 <SelectValue placeholder="Select department (optional)" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">No department</SelectItem>
+                <SelectItem value="none">No department</SelectItem>
                 {departments.map(dept => (
                   <SelectItem key={dept.id} value={dept.id}>
                     {dept.name}
