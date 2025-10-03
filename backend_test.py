@@ -353,30 +353,41 @@ class BackendTester:
         print("\n=== Testing Expired Trial Access Control ===")
         
         expired_user_data = {
-            "username": "expired_trial_user_2025",
-            "email": "expired_trial@equiptrack.com",
+            "username": f"expired_trial_user_{TIMESTAMP}",
+            "email": f"expired_trial_{TIMESTAMP}@equiptrack.com",
             "password": "ExpiredTestPass123!",
             "role": "Admin"
         }
         
-        # Register user
-        success, response, status = await self.make_request(
-            "POST", "/auth/register", expired_user_data, expect_status=200
+        # Try login first
+        login_success, login_response, login_status = await self.make_request(
+            "POST", "/auth/login", {
+                "username": expired_user_data["username"],
+                "password": expired_user_data["password"]
+            }, expect_status=200
         )
         
-        if not success:
-            self.log_result("Expired Trial User Setup", False, 
-                          f"Failed to create expired trial user: {response}")
-            return
+        if not login_success:
+            # Register user
+            success, response, status = await self.make_request(
+                "POST", "/auth/register", expired_user_data, expect_status=200
+            )
             
-        expired_auth_token = response.get("access_token")
+            if not success:
+                self.log_result("Expired Trial User Setup", False, 
+                              f"Failed to create expired trial user: {response}")
+                return
+                
+            expired_auth_token = response.get("access_token")
+        else:
+            expired_auth_token = login_response.get("access_token")
         
         # Note: In a real test, we would need to manipulate the database to set 
         # trial_start to more than 14 days ago. For this test, we'll assume
         # the trial logic is working based on the code review.
         
         self.log_result("Expired Trial Test Setup", True, 
-                      "Created user for expired trial testing (DB manipulation needed for full test)")
+                      "User ready for expired trial testing (DB manipulation needed for full test)")
         
     async def run_all_tests(self):
         """Run all backend tests"""
