@@ -615,6 +615,9 @@ async def create_checkout_session(request: PaymentPackageRequest, current_user: 
     
     package = PAYMENT_PACKAGES[request.package_id]
     
+    # Calculate total amount based on user count
+    total_amount = package["amount"] * request.user_count
+    
     # Initialize Stripe
     stripe_api_key = os.environ.get('STRIPE_SECRET_KEY')
     if not stripe_api_key:
@@ -629,7 +632,7 @@ async def create_checkout_session(request: PaymentPackageRequest, current_user: 
     
     # Create checkout session
     checkout_request = CheckoutSessionRequest(
-        amount=package["amount"],
+        amount=total_amount,
         currency="usd",
         success_url=success_url,
         cancel_url=cancel_url,
@@ -637,7 +640,9 @@ async def create_checkout_session(request: PaymentPackageRequest, current_user: 
             "user_id": current_user.id,
             "email": current_user.email,
             "package_id": request.package_id,
-            "package_name": package["name"]
+            "package_name": package["name"],
+            "user_count": str(request.user_count),
+            "price_per_user": str(package["amount"])
         }
     )
     
