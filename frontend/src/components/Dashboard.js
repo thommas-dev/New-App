@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
+import TrialStatus from './TrialStatus';
 import KanbanBoard from './KanbanBoard';
 import DepartmentManagement from './DepartmentManagement';
 import MachineManagement from './MachineManagement';
