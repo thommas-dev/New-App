@@ -39,20 +39,40 @@ function DailyTasks({ user }) {
       priority: 'High',
       status: 'pending',
       overdue: false,
-      checklist: ['Check oil level', 'Record readings', 'Top up if needed']
+      frequency: 'Daily',
+      notes: 'Check hydraulic oil levels and record readings. Top up if below minimum line.',
+      safety_notes: 'Ensure machine is powered off before checking oil levels.',
+      checklist: [
+        { id: '1-1', text: 'Check oil level', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '1-2', text: 'Record readings', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '1-3', text: 'Top up if needed', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     },
     {
       id: 2,
+      wo_id: 'WO-2025-0003',
       title: 'Replace conveyor belt',
       type: 'repair',
       scheduledTime: '14:00',
       department: 'Production',
+      department_name: 'Production',
       machine: 'Conveyor Belt A',
+      machine_name: 'Conveyor Belt A',
       assignee: 'Mike Johnson',
+      assignee_name: 'Mike Johnson',
+      requested_by_name: 'admin2',
       priority: 'Critical',
       status: 'in-progress',
       overdue: true,
-      checklist: ['Shut down production line', 'Remove old belt', 'Install new belt', 'Test operation']
+      description: 'Emergency conveyor belt replacement due to mechanical failure.',
+      created_at: new Date().toISOString(),
+      checklist: [
+        { id: '2-1', text: 'Shut down production line', completed: true },
+        { id: '2-2', text: 'Remove old belt', completed: false },
+        { id: '2-3', text: 'Install new belt', completed: false },
+        { id: '2-4', text: 'Test operation', completed: false }
+      ],
+      tags: ['urgent', 'production']
     },
     {
       id: 3,
@@ -65,7 +85,14 @@ function DailyTasks({ user }) {
       priority: 'Medium',
       status: 'completed',
       overdue: false,
-      checklist: ['Visual inspection', 'Check tension', 'Clean belt surface']
+      frequency: 'Daily',
+      notes: 'Daily visual inspection of conveyor belt system for wear and proper operation.',
+      safety_notes: 'Use lockout/tagout procedures before inspection.',
+      checklist: [
+        { id: '3-1', text: 'Visual inspection', completed: true, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '3-2', text: 'Check tension', completed: true, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '3-3', text: 'Clean belt surface', completed: true, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     },
     {
       id: 4,
@@ -78,7 +105,14 @@ function DailyTasks({ user }) {
       priority: 'High',
       status: 'pending',
       overdue: false,
-      checklist: ['Test all emergency stops', 'Check alarm systems', 'Verify safety protocols']
+      frequency: 'Daily',
+      notes: 'Daily safety system verification and testing.',
+      safety_notes: 'Follow safety protocols when testing emergency systems.',
+      checklist: [
+        { id: '4-1', text: 'Test all emergency stops', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '4-2', text: 'Check alarm systems', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '4-3', text: 'Verify safety protocols', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     }
   ];
 
