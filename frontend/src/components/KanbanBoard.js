@@ -23,7 +23,6 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const COLUMNS = [
-  { id: 'Backlog', title: 'Backlog', color: 'status-backlog' },
   { id: 'Scheduled', title: 'Scheduled', color: 'status-scheduled' },
   { id: 'In Progress', title: 'In Progress', color: 'status-in-progress' },
   { id: 'Completed', title: 'Completed', color: 'status-completed' },
