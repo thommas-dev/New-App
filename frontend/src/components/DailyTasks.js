@@ -305,18 +305,25 @@ function DailyTasks({ user }) {
                 ></div>
               </div>
               <div className="space-y-1">
-                {task.checklist.slice(0, 2).map((item, index) => (
-                  <div key={index} className="flex items-center space-x-2">
-                    <Checkbox 
-                      size="sm" 
-                      checked={task.status === 'completed' || (typeof item === 'object' && item.completed)}
-                      disabled={task.status === 'completed'}
-                    />
-                    <span className={`text-xs ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-700'}`}>
-                      {typeof item === 'string' ? item : (item?.text || item)}
-                    </span>
-                  </div>
-                ))}
+                {task.checklist.slice(0, 2).map((item, index) => {
+                  const itemId = typeof item === 'object' ? item.id : `${task.id}-${index}`;
+                  const isCompleted = task.status === 'completed' || (typeof item === 'object' && item.completed);
+                  
+                  return (
+                    <div key={index} className="flex items-center space-x-2">
+                      <Checkbox 
+                        size="sm" 
+                        checked={isCompleted}
+                        disabled={task.status === 'completed'}
+                        onCheckedChange={(checked) => handleChecklistToggle(task.id, itemId, checked, event)}
+                        onClick={(event) => event.stopPropagation()}
+                      />
+                      <span className={`text-xs ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-700'}`}>
+                        {typeof item === 'string' ? item : (item?.text || item)}
+                      </span>
+                    </div>
+                  );
+                })}
                 {task.checklist.length > 2 && (
                   <p className="text-xs text-gray-500 ml-6">+{task.checklist.length - 2} more items</p>
                 )}
