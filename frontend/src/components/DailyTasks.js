@@ -21,14 +21,7 @@ import { toast } from 'sonner';
 function DailyTasks({ user }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
-    return () => clearInterval(timer);
-  }, []);
-
-  // Sample data for today's tasks
-  const todaysTasks = [
+  const [todaysTasks, setTodaysTasks] = useState([
     {
       id: 1,
       title: 'Oil Level Check - CNC Machine 01',
