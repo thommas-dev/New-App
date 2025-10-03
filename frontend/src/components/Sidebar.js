@@ -116,7 +116,7 @@ function Sidebar({ user, onLogout, onCloseSidebar }) {
               <span className="text-xs text-blue-700 font-medium">Free Trial Active</span>
             </div>
             <p className="text-xs text-blue-600 mt-1">
-              Enjoy full access for 30 days
+              Enjoy full access for 14 days
             </p>
           </div>
         )}
