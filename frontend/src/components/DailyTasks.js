@@ -192,42 +192,32 @@ function DailyTasks({ user }) {
     setSelectedTask(null);
   };
 
-  const handleChecklistToggle = async (taskId, itemId, completed, event) => {
+  const handleChecklistToggle = (taskId, itemId, completed, event) => {
     event.stopPropagation(); // Prevent opening the task detail
     
-    try {
-      // Update local state immediately for responsiveness
-      const updatedTasks = todaysTasks.map(task => {
-        if (task.id === taskId) {
-          return {
-            ...task,
-            checklist: task.checklist.map(item => 
-              (typeof item === 'object' && item.id === itemId) || 
-              (typeof item === 'string' && item === itemId)
-                ? {
-                    ...(typeof item === 'object' ? item : { id: itemId, text: item }),
-                    completed,
-                    completed_by: completed ? user.username : null,
-                    completed_at: completed ? new Date().toISOString() : null
-                  }
-                : item
-            )
-          };
-        }
-        return task;
-      });
-      
-      setTodaysTasks(updatedTasks);
-      
-      // Auto-save to backend (simulated for daily tasks)
-      // In a real implementation, this would save to the appropriate endpoint
-      toast.success(`Checklist item ${completed ? 'completed' : 'unchecked'}`);
-      
-    } catch (error) {
-      console.error('Failed to update checklist:', error);
-      // Revert the change on error by refetching or using previous state
-      toast.error('Failed to update checklist - changes reverted');
-    }
+    // Update local state only (no backend call for sample data)
+    const updatedTasks = todaysTasks.map(task => {
+      if (task.id === taskId) {
+        return {
+          ...task,
+          checklist: task.checklist.map(item => 
+            (typeof item === 'object' && item.id === itemId) || 
+            (typeof item === 'string' && item === itemId)
+              ? {
+                  ...(typeof item === 'object' ? item : { id: itemId, text: item }),
+                  completed,
+                  completed_by: completed ? user.username : null,
+                  completed_at: completed ? new Date().toISOString() : null
+                }
+              : item
+          )
+        };
+      }
+      return task;
+    });
+    
+    setTodaysTasks(updatedTasks);
+    toast.success(`Checklist item ${completed ? 'completed' : 'unchecked'}`);
   };
 
   const TaskCard = ({ task, showNotification = false }) => {
