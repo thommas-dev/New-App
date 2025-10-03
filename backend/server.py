@@ -440,6 +440,16 @@ async def create_work_order(wo_data: WorkOrderCreate, current_user: User = Depen
 @api_router.get("/work-orders", response_model=List[WorkOrder])
 async def get_work_orders(current_user: User = Depends(get_current_user)):
     work_orders = await db.work_orders.find().sort("created_at", -1).to_list(length=None)
+    
+    # Migrate old "Backlog" status to "Scheduled"
+    for wo in work_orders:
+        if wo.get("status") == "Backlog":
+            await db.work_orders.update_one(
+                {"id": wo["id"]}, 
+                {"$set": {"status": "Scheduled"}}
+            )
+            wo["status"] = "Scheduled"
+    
     return [WorkOrder(**parse_from_mongo(wo)) for wo in work_orders]
 
 @api_router.get("/work-orders/{wo_id}", response_model=WorkOrder)
