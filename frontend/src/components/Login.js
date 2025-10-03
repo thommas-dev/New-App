@@ -215,21 +215,11 @@ function Login({ onLogin }) {
                       onValueChange={(value) => setRegisterForm({ ...registerForm, role: value })}
                     >
                       <SelectTrigger className="bg-white border-gray-200 focus:border-blue-400 focus:ring-blue-400" data-testid="register-role">
-                        <SelectValue />
+                        <SelectValue placeholder="Select role" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="Admin">
-                          <div className="flex items-center space-x-2">
-                            <Settings className="w-4 h-4 text-blue-600" />
-                            <span>Admin</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="Maintenance Supervisor">
-                          <div className="flex items-center space-x-2">
-                            <Users className="w-4 h-4 text-green-600" />
-                            <span>Maintenance Supervisor</span>
-                          </div>
-                        </SelectItem>
+                        <SelectItem value="Admin">Admin</SelectItem>
+                        <SelectItem value="Maintenance Supervisor">Maintenance Supervisor</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
