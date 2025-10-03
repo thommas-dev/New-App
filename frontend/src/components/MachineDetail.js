@@ -224,9 +224,7 @@ function MachineDetail({ machine, onClose, onUpdate, user }) {
             <Tabs defaultValue="details" className="space-y-6">
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="details">Details</TabsTrigger>
-                <TabsTrigger value="checklist">
-                  Checklist ({completedItems}/{totalItems})
-                </TabsTrigger>
+                <TabsTrigger value="documentation">Documentation</TabsTrigger>
                 <TabsTrigger value="files">Files & Diagrams</TabsTrigger>
                 <TabsTrigger value="maintenance">Maintenance History</TabsTrigger>
               </TabsList>
