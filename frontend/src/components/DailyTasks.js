@@ -145,16 +145,28 @@ function DailyTasks({ user }) {
     return hoursDiff > 0 && hoursDiff <= 2; // Upcoming in next 2 hours
   };
 
+  const handleTaskClick = (task) => {
+    setSelectedTask(task);
+  };
+
+  const handleTaskUpdate = (updatedTask) => {
+    // In a full implementation, you'd update the task in the state
+    setSelectedTask(null);
+  };
+
   const TaskCard = ({ task, showNotification = false }) => {
     const Icon = getTypeIcon(task.type);
     const upcomingTask = isTaskUpcoming(task.scheduledTime);
     
     return (
-      <Card className={`
-        border transition-all duration-200 hover:shadow-md
-        ${task.overdue ? 'border-red-200 bg-red-50' : 'border-gray-200'}
-        ${upcomingTask ? 'ring-2 ring-blue-200 bg-blue-50' : ''}
-      `}>
+      <Card 
+        className={`
+          border transition-all duration-200 hover:shadow-md cursor-pointer
+          ${task.overdue ? 'border-red-200 bg-red-50' : 'border-gray-200'}
+          ${upcomingTask ? 'ring-2 ring-blue-200 bg-blue-50' : ''}
+        `}
+        onClick={() => handleTaskClick(task)}
+      >
         <CardContent className="p-4">
           <div className="flex items-start justify-between mb-3">
             <div className="flex-1">
