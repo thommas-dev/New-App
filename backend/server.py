@@ -577,7 +577,7 @@ async def delete_work_order(wo_id: str, current_user: User = Depends(get_current
 
 # Users route for assignee dropdown
 @api_router.get("/users", response_model=List[User])
-async def get_users(current_user: User = Depends(get_current_user)):
+async def get_users(current_user: User = Depends(get_current_user_with_access)):
     users = await db.users.find().to_list(length=None)
     return [User(**parse_from_mongo(user)) for user in users]
 
