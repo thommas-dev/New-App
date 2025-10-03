@@ -39,6 +39,7 @@ function KanbanBoard({ user }) {
   const [filterPriority, setFilterPriority] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [departments, setDepartments] = useState([]);
+  const [selectedWorkOrder, setSelectedWorkOrder] = useState(null);
 
   const fetchWorkOrders = async () => {
     try {
