@@ -247,36 +247,20 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
 
   // Removed old functions - using async versions below
 
-  const handleChecklistToggle = async (itemId, completed) => {
-    try {
-      // Update local state immediately for responsiveness
-      const updatedChecklist = checklist.map(item => 
-        item.id === itemId 
-          ? { 
-              ...item, 
-              completed, 
-              completed_by: completed ? user.username : null,
-              completed_at: completed ? new Date().toISOString() : null
-            } 
-          : item
-      );
-      
-      setChecklist(updatedChecklist);
-      
-      // Auto-save to backend (simulated for maintenance tasks)
-      // In a real implementation, this would save to a maintenance tasks endpoint
-      toast.success(`Checklist item ${completed ? 'completed' : 'unchecked'}`);
-      
-      // Update parent component if callback provided
-      if (onUpdate) {
-        onUpdate({ ...task, checklist: updatedChecklist });
-      }
-    } catch (error) {
-      console.error('Failed to update checklist:', error);
-      // Revert the change on error
-      setChecklist(checklist);
-      toast.error('Failed to update checklist - changes reverted');
-    }
+  const handleChecklistToggle = (itemId, completed) => {
+    // Update local state only (no auto-save)
+    const updatedChecklist = checklist.map(item => 
+      item.id === itemId 
+        ? { 
+            ...item, 
+            completed, 
+            completed_by: completed ? user.username : null,
+            completed_at: completed ? new Date().toISOString() : null
+          } 
+        : item
+    );
+    
+    setChecklist(updatedChecklist);
   };
 
   const addChecklistItem = async () => {
