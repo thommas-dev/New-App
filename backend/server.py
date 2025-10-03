@@ -184,6 +184,7 @@ class PaymentTransaction(BaseModel):
 class PaymentPackageRequest(BaseModel):
     package_id: str
     origin_url: str
+    user_count: int = 1
 
 class SubscriptionStatus(BaseModel):
     is_trial: bool
