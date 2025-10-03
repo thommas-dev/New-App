@@ -308,7 +308,11 @@ function CalendarView({ user }) {
                 {selectedDateEvents.map(event => {
                   const Icon = getEventTypeIcon(event.type);
                   return (
-                    <div key={event.id} className="p-3 bg-gray-50 rounded-lg border">
+                    <div 
+                      key={event.id} 
+                      className="p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100 transition-colors duration-200"
+                      onClick={() => handleTaskClick(event)}
+                    >
                       <div className="flex items-start space-x-3">
                         <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
                           event.type === 'maintenance' ? 'bg-green-100' : 'bg-blue-100'
