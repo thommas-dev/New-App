@@ -544,7 +544,7 @@ async def get_work_order(wo_id: str, current_user: User = Depends(get_current_us
     return WorkOrder(**parse_from_mongo(work_order))
 
 @api_router.put("/work-orders/{wo_id}", response_model=WorkOrder)
-async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user: User = Depends(get_current_user)):
+async def update_work_order(wo_id: str, wo_update: WorkOrderUpdate, current_user: User = Depends(get_current_user_with_access)):
     work_order = await db.work_orders.find_one({"id": wo_id})
     if not work_order:
         raise HTTPException(status_code=404, detail="Work order not found")
