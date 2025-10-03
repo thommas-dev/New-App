@@ -7,6 +7,7 @@ import {
   Settings, 
   LogOut, 
   Clock, 
+  Calendar,
   Settings as SettingsIcon,
   Users
 } from 'lucide-react';
