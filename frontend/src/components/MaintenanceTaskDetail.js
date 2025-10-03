@@ -672,6 +672,19 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
                   ))}
                 </div>
 
+                {totalItems > 0 && (
+                  <div className="flex justify-end pt-4 border-t">
+                    <Button
+                      onClick={saveChecklistChanges}
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      data-testid="save-maintenance-checklist"
+                    >
+                      <Save className="w-4 h-4 mr-2" />
+                      Save Checklist
+                    </Button>
+                  </div>
+                )}
+
                 {totalItems === 0 && (
                   <div className="text-center py-8 text-gray-500">
                     <CheckSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
