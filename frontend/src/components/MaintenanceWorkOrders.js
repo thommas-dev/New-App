@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import MaintenanceTaskDetail from './MaintenanceTaskDetail';
+import MaintenanceTaskForm from './MaintenanceTaskForm';
 import { 
   Calendar,
   Clock,
@@ -9,7 +11,8 @@ import {
   Plus,
   Settings,
   Building2,
-  FileText
+  FileText,
+  Printer
 } from 'lucide-react';
 
 function MaintenanceWorkOrders({ user }) {
