@@ -11,7 +11,7 @@ from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone, timedelta
 import jwt
-from passlib.context import CryptContext
+import hashlib
 from enum import Enum
 
 ROOT_DIR = Path(__file__).parent
