@@ -221,10 +221,7 @@ function WorkOrderForm({ user, onClose, onWorkOrderCreated }) {
               <SelectItem value="">No assignee</SelectItem>
               {users.map(user => (
                 <SelectItem key={user.id} value={user.id}>
-                  <div className="flex items-center space-x-2">
-                    <User className="w-4 h-4" />
-                    <span>{user.username} ({user.role})</span>
-                  </div>
+                  {user.username} ({user.role})
                 </SelectItem>
               ))}
             </SelectContent>
