@@ -186,7 +186,11 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
 
   const saveChecklistChanges = async () => {
     try {
-      // In a full implementation, you'd save to the backend
+      // Save to backend
+      await axios.put(`${API}/work-orders/${workOrder.id}`, {
+        checklist: checklist
+      });
+      
       toast.success('Checklist saved successfully!');
       setChecklistEditMode(false);
       
@@ -194,6 +198,7 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
         onUpdate({ ...workOrder, checklist });
       }
     } catch (error) {
+      console.error('Failed to save checklist:', error);
       toast.error('Failed to save checklist');
     }
   };
