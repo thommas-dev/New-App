@@ -272,12 +272,13 @@ function KanbanBoard({ user }) {
                       <Card
                         key={workOrder.id}
                         className={`
-                          cursor-move hover:shadow-lg transition-all duration-200 card-animation
+                          cursor-pointer hover:shadow-lg transition-all duration-200 card-animation
                           ${draggedItem?.id === workOrder.id ? 'opacity-50 rotate-2' : ''}
                           ${overdue ? 'ring-2 ring-red-300' : ''}
                         `}
                         draggable
                         onDragStart={(e) => handleDragStart(e, workOrder)}
+                        onClick={() => handleWorkOrderClick(workOrder)}
                         data-testid={`work-order-card-${workOrder.wo_id}`}
                       >
                         <CardHeader className="pb-2">
