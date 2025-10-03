@@ -395,7 +395,7 @@ async def create_department(dept_data: DepartmentCreate, current_user: User = De
     return department
 
 @api_router.get("/departments", response_model=List[Department])
-async def get_departments(current_user: User = Depends(get_current_user)):
+async def get_departments(current_user: User = Depends(get_current_user_with_access)):
     departments = await db.departments.find().to_list(length=None)
     return [Department(**parse_from_mongo(dept)) for dept in departments]
 
