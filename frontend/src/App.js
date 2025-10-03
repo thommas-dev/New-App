@@ -5,6 +5,8 @@ import { Toaster } from '@/components/ui/sonner';
 import { toast } from 'sonner';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
+import Pricing from './components/Pricing';
+import PaymentSuccess from './components/PaymentSuccess';
 import '@/App.css';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
