@@ -331,7 +331,7 @@ function MaintenanceWorkOrders({ user }) {
                         {task.checklist.slice(0, 2).map((item, index) => (
                           <li key={index} className="flex items-center">
                             <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-                            {typeof item === 'string' ? item : item.text}
+                            {typeof item === 'string' ? item : (item?.text || item)}
                           </li>
                         ))}
                         {task.checklist.length > 2 && (
