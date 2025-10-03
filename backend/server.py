@@ -454,7 +454,7 @@ async def get_machines(department_id: Optional[str] = None, current_user: User =
     return [Machine(**parse_from_mongo(machine)) for machine in machines]
 
 @api_router.delete("/machines/{machine_id}")
-async def delete_machine(machine_id: str, current_user: User = Depends(get_current_user)):
+async def delete_machine(machine_id: str, current_user: User = Depends(get_current_user_with_access)):
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(status_code=403, detail="Only admins can delete machines")
     
