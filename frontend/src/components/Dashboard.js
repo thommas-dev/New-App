@@ -52,6 +52,9 @@ function Dashboard({ user, onLogout }) {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
           <Routes>
             <Route path="/" element={<KanbanBoard user={user} />} />
+            <Route path="/maintenance" element={<MaintenanceWorkOrders user={user} />} />
+            <Route path="/calendar" element={<CalendarView user={user} />} />
+            <Route path="/daily-tasks" element={<DailyTasks user={user} />} />
             <Route path="/departments" element={<DepartmentManagement user={user} />} />
             <Route path="/machines" element={<MachineManagement user={user} />} />
           </Routes>
