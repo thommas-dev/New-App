@@ -296,88 +296,13 @@ function MachineDetail({ machine, onClose, onUpdate, user }) {
                 </div>
               </TabsContent>
 
-              <TabsContent value="checklist" className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-medium">Machine Checklist</h3>
-                  <div className="text-sm text-gray-600">
-                    {completedItems} of {totalItems} completed ({Math.round(progressPercentage)}%)
-                  </div>
+              <TabsContent value="documentation" className="space-y-4">
+                <h3 className="text-lg font-medium">Machine Documentation</h3>
+                <div className="text-center py-8 text-gray-500">
+                  <FileText className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <p>Machine documentation and reference materials will be managed here.</p>
+                  <p className="text-sm mt-2">Upload manuals, specifications, and maintenance guides.</p>
                 </div>
-
-                {totalItems > 0 && (
-                  <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-                    <div 
-                      className="bg-green-500 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${progressPercentage}%` }}
-                    ></div>
-                  </div>
-                )}
-
-                {/* Add new checklist item */}
-                <div className="flex space-x-2 p-4 bg-blue-50 rounded-lg">
-                  <Input
-                    type="text"
-                    placeholder="Add new checklist item (e.g., Check oil levels, Inspect belts)"
-                    value={newChecklistItem}
-                    onChange={(e) => setNewChecklistItem(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && addChecklistItem()}
-                    className="flex-1"
-                    data-testid="new-machine-checklist-item"
-                  />
-                  <Button
-                    onClick={addChecklistItem}
-                    disabled={!newChecklistItem.trim()}
-                    size="sm"
-                    data-testid="add-machine-checklist-item"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {checklist.map((item, index) => (
-                    <div key={item.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                      <Checkbox
-                        id={`machine-checklist-${item.id}`}
-                        checked={item.completed}
-                        onCheckedChange={(checked) => handleChecklistToggle(item.id, checked)}
-                        className="mt-0.5"
-                        data-testid={`machine-checklist-item-${index}`}
-                      />
-                      <div className="flex-1">
-                        <Label
-                          htmlFor={`machine-checklist-${item.id}`}
-                          className={`text-sm cursor-pointer ${
-                            item.completed ? 'line-through text-gray-500' : 'text-gray-900'
-                          }`}
-                        >
-                          {item.text}
-                        </Label>
-                        <div className="text-xs text-gray-500 mt-1">
-                          Added by {item.created_by} on {formatDate(item.created_at)}
-                          {item.completed && item.completed_by && (
-                            <span> • Completed by {item.completed_by}</span>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeChecklistItem(item.id)}
-                        className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-
-                {totalItems === 0 && (
-                  <div className="text-center py-8 text-gray-500">
-                    <CheckSquare className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                    <p>No checklist items yet. Add some inspection or maintenance checks above.</p>
-                  </div>
-                )}
               </TabsContent>
 
               <TabsContent value="files" className="space-y-4">
