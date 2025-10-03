@@ -121,6 +121,206 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     }
   };
 
+  const handleWorkOrderUpdate = (updatedWorkOrder) => {
+    setWorkOrders(prevOrders =>
+      prevOrders.map(wo =>
+        wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo
+      )
+    );
+    setSelectedWorkOrder(null);
+  };
+
+  const handlePrint = () => {
+    const printWindow = window.open('', '_blank');
+    const printContent = generateWorkOrderPrintContent();
+    printWindow.document.write(printContent);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  };
+
+  const generateWorkOrderPrintContent = () => {
+    const completedItems = workOrder.checklist?.filter(item => item.completed).length || 0;
+    const totalItems = workOrder.checklist?.length || 0;
+    
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Work Order - ${workOrder.wo_id}</title>
+          <style>
+            body { 
+              font-family: Arial, sans-serif; 
+              margin: 20px; 
+              line-height: 1.4; 
+            }
+            .header { 
+              border-bottom: 2px solid #333; 
+              padding-bottom: 10px; 
+              margin-bottom: 20px; 
+            }
+            .title { 
+              font-size: 24px; 
+              font-weight: bold; 
+              margin-bottom: 5px; 
+            }
+            .subtitle { 
+              color: #666; 
+              font-size: 14px; 
+            }
+            .section { 
+              margin-bottom: 20px; 
+            }
+            .section-title { 
+              font-size: 16px; 
+              font-weight: bold; 
+              margin-bottom: 10px; 
+              border-bottom: 1px solid #ddd; 
+              padding-bottom: 5px; 
+            }
+            .info-grid { 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 10px; 
+              margin-bottom: 15px; 
+            }
+            .info-item { 
+              display: flex; 
+            }
+            .info-label { 
+              font-weight: bold; 
+              min-width: 120px; 
+            }
+            .checklist-item { 
+              margin: 8px 0; 
+              display: flex; 
+              align-items: center; 
+            }
+            .checkbox { 
+              width: 16px; 
+              height: 16px; 
+              border: 1px solid #333; 
+              margin-right: 10px; 
+              display: inline-block; 
+            }
+            .checkbox.checked::after { 
+              content: '✓'; 
+              font-weight: bold; 
+              display: block; 
+              text-align: center; 
+              line-height: 14px; 
+            }
+            .signature-section { 
+              margin-top: 40px; 
+              display: grid; 
+              grid-template-columns: 1fr 1fr; 
+              gap: 40px; 
+            }
+            .signature-box { 
+              border-top: 1px solid #333; 
+              padding-top: 5px; 
+              text-align: center; 
+            }
+            @media print { 
+              body { margin: 0; } 
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">${workOrder.title}</div>
+            <div class="subtitle">Work Order ${workOrder.wo_id} - ${workOrder.type}</div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Work Order Information</div>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Priority:</span>
+                <span>${workOrder.priority}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Status:</span>
+                <span>${workOrder.status}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Assignee:</span>
+                <span>${workOrder.assignee_name || 'Not assigned'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Requested By:</span>
+                <span>${workOrder.requested_by_name}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Department:</span>
+                <span>${workOrder.department_name || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Machine:</span>
+                <span>${workOrder.machine_name || 'N/A'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Due Date:</span>
+                <span>${workOrder.due_date ? new Date(workOrder.due_date).toLocaleDateString() : 'Not set'}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Created:</span>
+                <span>${new Date(workOrder.created_at).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+
+          ${workOrder.description ? `
+            <div class="section">
+              <div class="section-title">Description</div>
+              <p>${workOrder.description}</p>
+            </div>
+          ` : ''}
+
+          <div class="section">
+            <div class="section-title">Checklist (${completedItems}/${totalItems} completed)</div>
+            ${workOrder.checklist && workOrder.checklist.length > 0 ? 
+              workOrder.checklist.map(item => `
+                <div class="checklist-item">
+                  <span class="checkbox ${item.completed ? 'checked' : ''}"></span>
+                  <span>${item.text}</span>
+                </div>
+              `).join('') : 
+              '<p>No checklist items defined.</p>'
+            }
+          </div>
+
+          ${workOrder.tags && workOrder.tags.length > 0 ? `
+            <div class="section">
+              <div class="section-title">Tags</div>
+              <p>${workOrder.tags.join(', ')}</p>
+            </div>
+          ` : ''}
+
+          <div class="section">
+            <div class="section-title">Notes/Comments</div>
+            <div style="border: 1px solid #ddd; min-height: 80px; padding: 10px;">
+              <!-- Space for technician notes -->
+            </div>
+          </div>
+
+          <div class="signature-section">
+            <div class="signature-box">
+              <div>Technician Signature</div>
+            </div>
+            <div class="signature-box">
+              <div>Supervisor Signature</div>
+            </div>
+          </div>
+
+          <div style="text-align: center; margin-top: 20px; font-size: 12px; color: #666;">
+            Generated on ${new Date().toLocaleDateString()} - SimplePM Board
+          </div>
+        </body>
+      </html>
+    `;
+  };
+
   const getPriorityColor = (priority) => {
     const colors = {
       'Critical': 'bg-red-500 text-white',
