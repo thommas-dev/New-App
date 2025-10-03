@@ -719,8 +719,44 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
               <TabsContent value="checklist" className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-medium">Checklist</h3>
-                  <div className="text-sm text-gray-600">
-                    {completedItems} of {totalItems} completed ({Math.round(progressPercentage)}%)
+                  <div className="flex items-center space-x-3">
+                    <div className="text-sm text-gray-600">
+                      {completedItems} of {totalItems} completed ({Math.round(progressPercentage)}%)
+                    </div>
+                    {!checklistEditMode && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setChecklistEditMode(true)}
+                        data-testid="edit-checklist-btn"
+                      >
+                        <Edit3 className="w-4 h-4 mr-2" />
+                        Edit
+                      </Button>
+                    )}
+                    {checklistEditMode && (
+                      <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          onClick={saveChecklistChanges}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                          data-testid="save-checklist-btn"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          Save
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setChecklistEditMode(false);
+                            setNewChecklistItem('');
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </div>
 
