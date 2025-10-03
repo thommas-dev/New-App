@@ -18,6 +18,7 @@ function CalendarView({ user }) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState('month');
+  const [selectedTask, setSelectedTask] = useState(null);
 
   // Sample data - in real app, this would come from API
   const sampleEvents = [
