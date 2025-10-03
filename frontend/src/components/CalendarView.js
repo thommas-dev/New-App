@@ -28,19 +28,45 @@ function CalendarView({ user }) {
       type: 'maintenance',
       date: '2025-10-03',
       time: '08:00',
+      scheduledTime: '08:00',
       department: 'Production',
       machine: 'CNC Machine 01',
-      status: 'scheduled'
+      status: 'scheduled',
+      frequency: 'Daily',
+      priority: 'High',
+      notes: 'Check hydraulic oil levels and record readings. Top up if below minimum line.',
+      safety_notes: 'Ensure machine is powered off before checking oil levels.',
+      checklist: [
+        { id: '1-1', text: 'Check oil level', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '1-2', text: 'Record readings', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '1-3', text: 'Top up if needed', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     },
     {
       id: 2,
+      wo_id: 'WO-2025-0001',
       title: 'Replace conveyor belt',
       type: 'repair',
       date: '2025-10-03',
       time: '14:00',
+      scheduledTime: '14:00',
       department: 'Production',
+      department_name: 'Production',
       machine: 'Conveyor Belt A',
-      status: 'in-progress'
+      machine_name: 'Conveyor Belt A',
+      status: 'in-progress',
+      priority: 'High',
+      assignee_name: 'Mike Johnson',
+      requested_by_name: 'admin2',
+      description: 'The main conveyor belt needs replacement due to wear and tear.',
+      created_at: new Date().toISOString(),
+      checklist: [
+        { id: '2-1', text: 'Shut down production line', completed: false },
+        { id: '2-2', text: 'Remove old belt', completed: false },
+        { id: '2-3', text: 'Install new belt', completed: false },
+        { id: '2-4', text: 'Test operation', completed: false }
+      ],
+      tags: ['urgent', 'production']
     },
     {
       id: 3,
@@ -48,9 +74,19 @@ function CalendarView({ user }) {
       type: 'maintenance',
       date: '2025-10-07',
       time: '10:00',
+      scheduledTime: '10:00',
       department: 'Utilities',
       machine: 'Air Compressor Unit 1',
-      status: 'scheduled'
+      status: 'scheduled',
+      frequency: 'Weekly',
+      priority: 'Medium',
+      notes: 'Replace air intake filter and check system pressure.',
+      safety_notes: 'Depressurize system before filter replacement.',
+      checklist: [
+        { id: '3-1', text: 'Turn off compressor', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '3-2', text: 'Replace air filter', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '3-3', text: 'Check pressure settings', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     },
     {
       id: 4,
@@ -58,9 +94,20 @@ function CalendarView({ user }) {
       type: 'maintenance',
       date: '2025-10-07',
       time: '09:00',
+      scheduledTime: '09:00',
       department: 'Facilities',
       machine: 'HVAC System',
-      status: 'scheduled'
+      status: 'scheduled',
+      frequency: 'Monthly',
+      priority: 'High',
+      notes: 'Complete monthly inspection of HVAC system including all components.',
+      safety_notes: 'Turn off power to units before inspection. Watch for electrical hazards.',
+      checklist: [
+        { id: '4-1', text: 'Check all filters', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '4-2', text: 'Inspect ductwork', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '4-3', text: 'Test thermostats', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '4-4', text: 'Clean coils', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     },
     {
       id: 5,
@@ -68,9 +115,19 @@ function CalendarView({ user }) {
       type: 'maintenance',
       date: '2025-10-10',
       time: '13:00',
+      scheduledTime: '13:00',
       department: 'Utilities',
       machine: 'Water Pump 1',
-      status: 'scheduled'
+      status: 'scheduled',
+      frequency: 'Monthly',
+      priority: 'Medium',
+      notes: 'Monthly maintenance check of water pump system.',
+      safety_notes: 'Lock out electrical supply before maintenance.',
+      checklist: [
+        { id: '5-1', text: 'Check pump alignment', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '5-2', text: 'Inspect seals', completed: false, created_by: 'System', created_at: new Date().toISOString() },
+        { id: '5-3', text: 'Test pressure', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+      ]
     }
   ];
 
