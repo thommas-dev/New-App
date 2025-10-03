@@ -245,26 +245,7 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     `;
   };
 
-  const addChecklistItem = () => {
-    if (!newChecklistItem.trim()) return;
-    
-    const newItem = {
-      id: Date.now().toString(),
-      text: newChecklistItem.trim(),
-      completed: false,
-      created_at: new Date().toISOString(),
-      created_by: user.username
-    };
-    
-    setChecklist(prev => [...prev, newItem]);
-    setNewChecklistItem('');
-    toast.success('Checklist item added');
-  };
-
-  const removeChecklistItem = (itemId) => {
-    setChecklist(prev => prev.filter(item => item.id !== itemId));
-    toast.success('Checklist item removed');
-  };
+  // Removed old functions - using async versions below
 
   const handleChecklistToggle = async (itemId, completed) => {
     try {
