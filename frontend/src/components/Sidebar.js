@@ -75,8 +75,8 @@ function Sidebar({ user, onLogout, onCloseSidebar }) {
             <SettingsIcon className="w-4 h-4 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-gray-900">SimplePM</h1>
-            <p className="text-xs text-gray-500">Board</p>
+            <h1 className="text-lg font-semibold text-gray-900">EquipTrack</h1>
+            <p className="text-xs text-gray-500">Pro</p>
           </div>
         </div>
       </div>
