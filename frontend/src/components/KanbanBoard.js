@@ -141,8 +141,8 @@ function KanbanBoard({ user }) {
 
   // Filter work orders
   const filteredWorkOrders = workOrders.filter(wo => {
-    const matchesDepartment = !filterDepartment || wo.department_id === filterDepartment;
-    const matchesPriority = !filterPriority || wo.priority === filterPriority;
+    const matchesDepartment = !filterDepartment || filterDepartment === 'all' || wo.department_id === filterDepartment;
+    const matchesPriority = !filterPriority || filterPriority === 'all' || wo.priority === filterPriority;
     const matchesSearch = !searchTerm || 
       wo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       wo.wo_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
