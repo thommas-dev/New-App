@@ -292,13 +292,11 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
         // This is a real work order - save to backend
         const API = process.env.REACT_APP_BACKEND_URL;
         
-        const axios = require('axios').default;
-        
-        const response = await axios.put(`${API}/api/work-orders/${task.id}`, {
+        await axios.put(`${API}/api/work-orders/${task.id}`, {
           checklist: checklist
         });
         
-        if (response.ok) {
+        // Success if no error thrown
           // Trigger cross-page synchronization
           const updateEvent = new CustomEvent('workOrderUpdated', {
             detail: { workOrderId: task.id, checklist: checklist }
