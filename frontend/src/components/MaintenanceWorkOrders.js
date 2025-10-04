@@ -323,21 +323,10 @@ function MaintenanceWorkOrders({ user }) {
                   
                   {task.checklist && task.checklist.length > 0 && (
                     <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <p className="text-sm font-medium text-gray-700 flex items-center">
-                          <FileText className="w-4 h-4 mr-1" />
-                          Checklist ({task.checklist.filter(item => typeof item === 'object' ? item.completed : false).length}/{task.checklist.length})
-                        </p>
-                        <span className="text-xs font-medium text-blue-600">
-                          {Math.round((task.checklist.filter(item => typeof item === 'object' ? item.completed : false).length / task.checklist.length) * 100)}%
-                        </span>
-                      </div>
-                      <div className="w-full bg-gray-200 rounded-full h-1.5 mb-3">
-                        <div 
-                          className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
-                          style={{ width: `${(task.checklist.filter(item => typeof item === 'object' ? item.completed : false).length / task.checklist.length) * 100}%` }}
-                        ></div>
-                      </div>
+                      <p className="text-sm font-medium text-gray-700 flex items-center mb-3">
+                        <FileText className="w-4 h-4 mr-1" />
+                        Checklist Items:
+                      </p>
                       <ul className="text-sm text-gray-600 space-y-1">
                         {task.checklist.slice(0, 2).map((item, index) => (
                           <li key={index} className="flex items-center">
