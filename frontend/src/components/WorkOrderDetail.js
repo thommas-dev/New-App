@@ -548,6 +548,22 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                 variant="ghost"
                 size="sm"
                 onClick={() => {
+                  // Block closing during save
+                  if (isChecklistSaving) {
+                    toast.info('Please wait for checklist to save before closing');
+                    return;
+                  }
+                  
+                  // Check for unsaved changes
+                  const currentDraft = localStorage.getItem(cacheKey);
+                  if (currentDraft && JSON.stringify(checklist) !== JSON.stringify(workOrder.checklist)) {
+                    const proceed = window.confirm('You have unsaved checklist changes. Close anyway?');
+                    if (!proceed) return;
+                    
+                    // Clear draft if user chooses to discard changes
+                    localStorage.removeItem(cacheKey);
+                  }
+                  
                   if (onUpdate) {
                     // Refresh parent data when closing
                     onUpdate(workOrder);
@@ -556,6 +572,7 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                 }}
                 className="h-8 w-8 p-0"
                 data-testid="close-work-order-detail"
+                disabled={isChecklistSaving}
               >
                 <X className="h-4 w-4" />
               </Button>
