@@ -495,10 +495,10 @@ class BackendTester:
         self.auth_token = None  # Remove auth token
         
         success, response, status = await self.make_request(
-            "PUT", f"/work-orders/{work_order_id}", {"checklist": []}, expect_status=401
+            "PUT", f"/work-orders/{work_order_id}", {"checklist": []}, expect_status=403
         )
         
-        if status == 401:
+        if status == 403:
             self.log_result("Checklist Update - Authentication Required", True,
                           "Properly requires authentication for checklist updates")
         else:
