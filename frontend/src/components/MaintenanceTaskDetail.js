@@ -291,7 +291,7 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
         // This is a real work order - save to backend
         const API = process.env.REACT_APP_BACKEND_URL;
         
-        await fetch(`${API}/api/work-orders/${task.id}`, {
+        const response = await fetch(`${API}/api/work-orders/${task.id}`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
@@ -302,7 +302,17 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
           })
         });
         
-        toast.success('Checklist saved successfully to database!');
+        if (response.ok) {
+          // Trigger cross-page synchronization
+          const updateEvent = new CustomEvent('workOrderUpdated', {
+            detail: { workOrderId: task.id, checklist: checklist }
+          });
+          window.dispatchEvent(updateEvent);
+          
+          toast.success('Checklist saved successfully to database!');
+        } else {
+          throw new Error('Save failed');
+        }
       } else {
         // This is sample maintenance task data - just show message
         toast.success('Sample maintenance task updated locally!');
