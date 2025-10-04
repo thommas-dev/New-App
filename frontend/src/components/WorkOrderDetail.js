@@ -882,12 +882,21 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                   <div className="flex justify-end pt-4 border-t">
                     <Button
                       onClick={saveChecklistChanges}
-                      disabled={loading}
+                      disabled={loading || isChecklistSaving}
                       className="bg-green-600 hover:bg-green-700 text-white"
                       data-testid="save-work-order-checklist"
                     >
-                      <Save className="w-4 h-4 mr-2" />
-                      {loading ? 'Saving...' : 'Save Checklist'}
+                      {isChecklistSaving ? (
+                        <div className="flex items-center space-x-2">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          <span>Saving...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4 mr-2" />
+                          Save Checklist
+                        </>
+                      )}
                     </Button>
                   </div>
                 )}
