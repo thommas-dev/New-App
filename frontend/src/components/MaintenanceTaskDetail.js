@@ -291,6 +291,8 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     );
     
     setChecklist(updatedChecklist);
+    // Save draft to localStorage for recovery
+    localStorage.setItem(cacheKey, JSON.stringify(updatedChecklist));
   };
 
   const addChecklistItem = () => {
