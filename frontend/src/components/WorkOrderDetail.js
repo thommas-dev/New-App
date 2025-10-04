@@ -163,7 +163,6 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       });
       
       toast.success('Checklist saved successfully!');
-      setChecklistEditMode(false);
       
       if (onUpdate) {
         onUpdate({ ...workOrder, checklist });
