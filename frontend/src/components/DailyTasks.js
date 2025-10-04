@@ -21,7 +21,43 @@ import { toast } from 'sonner';
 function DailyTasks({ user }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
-  const [todaysTasks, setTodaysTasks] = useState([
+  const [workOrders, setWorkOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const API = process.env.REACT_APP_BACKEND_URL;
+
+  // Fetch real work orders
+  useEffect(() => {
+    const fetchWorkOrders = async () => {
+      try {
+        const response = await fetch(`${API}/api/work-orders`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setWorkOrders(data);
+        } else {
+          console.error('Failed to fetch work orders');
+        }
+      } catch (error) {
+        console.error('Error fetching work orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchWorkOrders();
+  }, [API]);
+
+  // Filter work orders for today's tasks and add sample maintenance tasks
+  const todaysTasks = [
+    ...workOrders.filter(wo => {
+      // Show work orders that are not completed
+      return wo.status !== 'Completed';
+    }),
     {
       id: 1,
       title: 'Oil Level Check - CNC Machine 01',
