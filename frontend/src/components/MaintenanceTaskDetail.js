@@ -284,12 +284,36 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     toast.success('Checklist item removed');
   };
 
-  const saveChecklistChanges = () => {
-    // Save checklist changes manually
-    toast.success('Checklist saved successfully!');
-    
-    // Don't call onUpdate to prevent modal from closing
-    // Parent component will refresh data when modal is actually closed
+  const saveChecklistChanges = async () => {
+    try {
+      // Check if this is a real work order (has wo_id) or sample maintenance task
+      if (task.wo_id || task.id) {
+        // This is a real work order - save to backend
+        const API = process.env.REACT_APP_BACKEND_URL;
+        
+        await fetch(`${API}/api/work-orders/${task.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            checklist: checklist
+          })
+        });
+        
+        toast.success('Checklist saved successfully to database!');
+      } else {
+        // This is sample maintenance task data - just show message
+        toast.success('Sample maintenance task updated locally!');
+      }
+      
+      // Don't call onUpdate to prevent modal from closing
+      // Parent component will refresh data when modal is actually closed
+    } catch (error) {
+      console.error('Failed to save checklist:', error);
+      toast.error('Failed to save checklist');
+    }
   };
 
   const handleFileUpload = (event) => {
