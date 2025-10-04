@@ -291,15 +291,10 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
         // This is a real work order - save to backend
         const API = process.env.REACT_APP_BACKEND_URL;
         
-        const response = await fetch(`${API}/api/work-orders/${task.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          },
-          body: JSON.stringify({
-            checklist: checklist
-          })
+        const axios = require('axios').default;
+        
+        const response = await axios.put(`${API}/api/work-orders/${task.id}`, {
+          checklist: checklist
         });
         
         if (response.ok) {
