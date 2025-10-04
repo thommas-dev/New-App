@@ -186,29 +186,13 @@ function DailyTasks({ user }) {
   const handleChecklistToggle = (taskId, itemId, completed, event) => {
     event.stopPropagation(); // Prevent opening the task detail
     
-    // Update local state only (no backend call for sample data)
-    const updatedTasks = todaysTasks.map(task => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          checklist: task.checklist.map(item => 
-            (typeof item === 'object' && item.id === itemId) || 
-            (typeof item === 'string' && item === itemId)
-              ? {
-                  ...(typeof item === 'object' ? item : { id: itemId, text: item }),
-                  completed,
-                  completed_by: completed ? user.username : null,
-                  completed_at: completed ? new Date().toISOString() : null
-                }
-              : item
-          )
-        };
-      }
-      return task;
-    });
-    
-    setTodaysTasks(updatedTasks);
-    toast.success(`Checklist item ${completed ? 'completed' : 'unchecked'}`);
+    // For work orders, open the modal instead of updating locally
+    // For maintenance tasks, just show a message since they're sample data
+    if (typeof taskId === 'string' && taskId.startsWith('maintenance-')) {
+      toast.info('Open the maintenance task to update checklist items');
+    } else {
+      toast.info('Click the task card to open and modify the checklist');
+    }
   };
 
   const TaskCard = ({ task, showNotification = false }) => {
