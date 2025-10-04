@@ -50,7 +50,28 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [newChecklistItem, setNewChecklistItem] = useState('');
+  const [isChecklistSaving, setIsChecklistSaving] = useState(false);
   const abortRef = useRef(null);
+  
+  // Generate unique cache key for this work order
+  const cacheKey = `equiptrack:checklist:kanban:${workOrder.id}`;
+  
+  // Load checklist from localStorage on mount (check for unsaved changes)
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(cacheKey);
+    if (savedDraft) {
+      try {
+        const draftChecklist = JSON.parse(savedDraft);
+        // Only use draft if it's newer than current checklist
+        if (draftChecklist.length !== checklist.length || 
+            JSON.stringify(draftChecklist) !== JSON.stringify(checklist)) {
+          setChecklist(draftChecklist);
+        }
+      } catch (error) {
+        console.error('Failed to parse checklist draft:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     return () => {
