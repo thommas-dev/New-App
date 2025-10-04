@@ -873,11 +873,251 @@ class BackendTester:
             self.log_result("Progress Indicators Consistency", False, 
                           f"Only {consistent_count}/{total_count} work orders have consistent progress")
 
+    async def test_checklist_save_reopen_cycle(self):
+        """SPECIFIC TEST: Checklist save/reopen persistence as reported by user"""
+        print("\n=== SPECIFIC TEST: Checklist Save/Reopen Persistence ===")
+        
+        if not self.auth_token:
+            self.log_result("Checklist Save/Reopen", False, "No auth token available")
+            return
+            
+        # Step 1: Get an existing work order with checklist
+        print("\n--- Step 1: Get existing work order with checklist ---")
+        success, response, status = await self.make_request(
+            "GET", "/work-orders", expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Get Work Orders", False, f"Failed to get work orders: {response}", status)
+            return
+            
+        work_orders = response
+        target_wo = None
+        
+        # Find a work order with existing checklist or create one
+        for wo in work_orders:
+            if wo.get("checklist") and len(wo["checklist"]) > 0:
+                target_wo = wo
+                break
+                
+        if not target_wo:
+            # Create a work order with checklist for testing
+            print("No existing work order with checklist found, creating one...")
+            work_order_data = {
+                "title": "Checklist Persistence Test WO",
+                "type": "PM", 
+                "priority": "Medium",
+                "description": "Testing checklist save/reopen persistence",
+                "checklist_items": ["Check oil levels", "Inspect belts", "Test safety systems"]
+            }
+            
+            success, response, status = await self.make_request(
+                "POST", "/work-orders", work_order_data, expect_status=200
+            )
+            
+            if not success:
+                self.log_result("Create Test Work Order", False, f"Failed to create WO: {response}", status)
+                return
+                
+            target_wo = response
+            
+        work_order_id = target_wo["id"]
+        original_checklist = target_wo.get("checklist", [])
+        
+        self.log_result("Get Target Work Order", True, 
+                      f"Using work order {target_wo.get('wo_id')} with {len(original_checklist)} checklist items")
+        
+        # Step 2: Modify checklist items (mark some as completed, add new items)
+        print("\n--- Step 2: Modify checklist items ---")
+        modified_checklist = []
+        
+        # Modify existing items
+        for i, item in enumerate(original_checklist):
+            modified_item = {
+                "id": item.get("id", f"item-{i}"),
+                "text": item.get("text"),
+                "completed": i % 2 == 0,  # Mark every other item as completed
+            }
+            if modified_item["completed"]:
+                modified_item["completed_by"] = self.user_id
+                modified_item["completed_at"] = datetime.now(timezone.utc).isoformat()
+            modified_checklist.append(modified_item)
+            
+        # Add new items
+        modified_checklist.extend([
+            {
+                "id": "new-item-1",
+                "text": "New task: Check hydraulic fluid",
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "new-item-2", 
+                "text": "New task: Verify emergency stops",
+                "completed": False
+            }
+        ])
+        
+        # Step 3: Send PUT request to update the work order with modified checklist
+        print("\n--- Step 3: Send PUT request to update checklist ---")
+        update_data = {"checklist": modified_checklist}
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", update_data, expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Checklist Update PUT Request", False, 
+                          f"Failed to update checklist: {response}", status)
+            return
+            
+        updated_checklist = response.get("checklist", [])
+        updated_completed_count = sum(1 for item in updated_checklist if item.get("completed"))
+        
+        self.log_result("Checklist Update PUT Request", True, 
+                      f"Successfully updated checklist - {len(updated_checklist)} items, {updated_completed_count} completed")
+        
+        # Step 4: Immediately retrieve the same work order again
+        print("\n--- Step 4: Immediately retrieve work order again ---")
+        success, response, status = await self.make_request(
+            "GET", f"/work-orders/{work_order_id}", expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Immediate Retrieval", False, 
+                          f"Failed to retrieve work order: {response}", status)
+            return
+            
+        retrieved_checklist = response.get("checklist", [])
+        retrieved_completed_count = sum(1 for item in retrieved_checklist if item.get("completed"))
+        
+        # Step 5: Verify all checklist changes persisted correctly
+        print("\n--- Step 5: Verify checklist changes persisted ---")
+        
+        # Check item count
+        if len(retrieved_checklist) == len(modified_checklist):
+            self.log_result("Persistence - Item Count", True, 
+                          f"Item count persisted correctly: {len(retrieved_checklist)} items")
+        else:
+            self.log_result("Persistence - Item Count", False, 
+                          f"Item count mismatch - Expected: {len(modified_checklist)}, Got: {len(retrieved_checklist)}")
+            
+        # Check completion count
+        if retrieved_completed_count == updated_completed_count:
+            self.log_result("Persistence - Completion Count", True, 
+                          f"Completion count persisted correctly: {retrieved_completed_count} completed")
+        else:
+            self.log_result("Persistence - Completion Count", False, 
+                          f"Completion count mismatch - Expected: {updated_completed_count}, Got: {retrieved_completed_count}")
+            
+        # Check specific items
+        persistence_issues = []
+        
+        for modified_item in modified_checklist:
+            item_id = modified_item["id"]
+            retrieved_item = next((item for item in retrieved_checklist if item.get("id") == item_id), None)
+            
+            if not retrieved_item:
+                persistence_issues.append(f"Item {item_id} not found in retrieved checklist")
+                continue
+                
+            # Check text
+            if retrieved_item.get("text") != modified_item.get("text"):
+                persistence_issues.append(f"Item {item_id} text mismatch")
+                
+            # Check completion status
+            if retrieved_item.get("completed") != modified_item.get("completed"):
+                persistence_issues.append(f"Item {item_id} completion status mismatch")
+                
+            # Check completion metadata
+            if modified_item.get("completed"):
+                if not retrieved_item.get("completed_by") or not retrieved_item.get("completed_at"):
+                    persistence_issues.append(f"Item {item_id} missing completion metadata")
+                    
+        if not persistence_issues:
+            self.log_result("Persistence - Item Details", True, 
+                          "All checklist item details persisted correctly")
+        else:
+            self.log_result("Persistence - Item Details", False, 
+                          f"Persistence issues found: {'; '.join(persistence_issues)}")
+            
+        # Step 6: Test multiple cycles of modification and retrieval
+        print("\n--- Step 6: Test multiple save/reopen cycles ---")
+        
+        for cycle in range(3):
+            print(f"  Cycle {cycle + 1}/3")
+            
+            # Modify checklist again
+            cycle_checklist = []
+            for item in retrieved_checklist:
+                cycle_item = item.copy()
+                cycle_item["text"] = f"{item.get('text')} [Cycle {cycle + 1}]"
+                # Toggle completion status
+                cycle_item["completed"] = not item.get("completed", False)
+                if cycle_item["completed"]:
+                    cycle_item["completed_by"] = self.user_id
+                    cycle_item["completed_at"] = datetime.now(timezone.utc).isoformat()
+                else:
+                    cycle_item.pop("completed_by", None)
+                    cycle_item.pop("completed_at", None)
+                cycle_checklist.append(cycle_item)
+                
+            # Update
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", {"checklist": cycle_checklist}, expect_status=200
+            )
+            
+            if not success:
+                self.log_result(f"Multiple Cycles - Update {cycle + 1}", False, 
+                              f"Update failed: {response}", status)
+                break
+                
+            # Retrieve
+            success, response, status = await self.make_request(
+                "GET", f"/work-orders/{work_order_id}", expect_status=200
+            )
+            
+            if not success:
+                self.log_result(f"Multiple Cycles - Retrieve {cycle + 1}", False, 
+                              f"Retrieve failed: {response}", status)
+                break
+                
+            retrieved_checklist = response.get("checklist", [])
+            
+            # Quick validation
+            if len(retrieved_checklist) == len(cycle_checklist):
+                cycle_success = True
+            else:
+                cycle_success = False
+                
+            if not cycle_success:
+                self.log_result(f"Multiple Cycles - Cycle {cycle + 1}", False, 
+                              f"Data mismatch in cycle {cycle + 1}")
+                break
+        else:
+            self.log_result("Multiple Save/Reopen Cycles", True, 
+                          "Successfully completed 3 save/reopen cycles with data persistence")
+            
+        # Final verification
+        print("\n--- Final Verification ---")
+        final_success, final_response, final_status = await self.make_request(
+            "GET", f"/work-orders/{work_order_id}", expect_status=200
+        )
+        
+        if final_success:
+            final_checklist = final_response.get("checklist", [])
+            self.log_result("Final Checklist State", True, 
+                          f"Final state: {len(final_checklist)} items in checklist")
+        else:
+            self.log_result("Final Checklist State", False, 
+                          f"Failed final verification: {final_response}", final_status)
+
     async def run_all_tests(self):
-        """Run all backend tests focusing on critical data loading failures"""
-        print("🚀 URGENT: EquipTrack Critical Data Loading Diagnostic")
+        """Run all backend tests focusing on checklist persistence"""
+        print("🚀 FOCUSED: EquipTrack Checklist Persistence Testing")
         print(f"Testing against: {BASE_URL}")
-        print("Focus: Critical data loading failures reported by user")
+        print("Focus: Checklist save/reopen persistence issues reported by user")
         
         await self.setup()
         
@@ -886,16 +1126,11 @@ class BackendTester:
             await self.test_user_registration_with_trial()
             await self.test_authentication_and_access_detailed()
             
-            # CRITICAL: Data Loading Tests
-            await self.test_critical_data_loading_failures()
+            # MAIN FOCUS: Checklist Save/Reopen Persistence Test
+            await self.test_checklist_save_reopen_cycle()
             
-            # CRITICAL: Checklist Persistence Tests
+            # Additional checklist tests
             await self.test_checklist_persistence_comprehensive()
-            
-            # Data Consistency Tests
-            await self.test_data_consistency_and_progress()
-            
-            # Original comprehensive checklist test
             await self.test_work_order_checklist_update()
             
         finally:
