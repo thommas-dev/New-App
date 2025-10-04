@@ -288,10 +288,8 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     // Save checklist changes manually
     toast.success('Checklist saved successfully!');
     
-    // Update parent component if callback provided
-    if (onUpdate) {
-      onUpdate({ ...task, checklist });
-    }
+    // Don't call onUpdate to prevent modal from closing
+    // Parent component will refresh data when modal is actually closed
   };
 
   const handleFileUpload = (event) => {
