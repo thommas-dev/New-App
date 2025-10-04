@@ -50,6 +50,14 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   const [users, setUsers] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [newChecklistItem, setNewChecklistItem] = useState('');
+  const abortRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      // Cancel any in-flight save on unmount
+      abortRef.current?.abort();
+    };
+  }, []);
 
   useEffect(() => {
     fetchUsers();
