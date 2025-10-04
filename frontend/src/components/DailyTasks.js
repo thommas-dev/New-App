@@ -456,9 +456,9 @@ function DailyTasks({ user }) {
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {todaysTasks
               .sort((a, b) => {
-                // Sort by time
-                const timeA = parseInt(a.scheduledTime.replace(':', ''));
-                const timeB = parseInt(b.scheduledTime.replace(':', ''));
+                // Sort by time, handle missing scheduledTime
+                const timeA = a.scheduledTime ? parseInt(a.scheduledTime.replace(':', '')) : 9999;
+                const timeB = b.scheduledTime ? parseInt(b.scheduledTime.replace(':', '')) : 9999;
                 return timeA - timeB;
               })
               .map(task => (
