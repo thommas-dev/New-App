@@ -194,6 +194,9 @@
       - working: true
         agent: "testing"
         comment: "✅ VERIFIED: Work order checklist update functionality working correctly. PUT /api/work-orders/{id} endpoint successfully accepts and saves checklist data. Tested with: (1) New checklist items with proper structure, (2) Empty checklist updates, (3) Malformed data handling, (4) Authentication requirements, (5) Non-existent work order handling. WorkOrderUpdate model properly accepts checklist field as Optional[List[WorkOrderChecklistItem]]. Backend logs show 200 OK responses for all valid checklist updates. The 'Failed to save checklist' error is likely a frontend issue, not backend."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-VERIFIED AFTER DOUBLE /API FIX: Comprehensive testing confirms work order checklist save functionality is working perfectly. Tested complete workflow: (1) Created work order with 3 initial checklist items, (2) Updated with 4 mixed completed/uncompleted items with proper structure including completed_by and completed_at fields, (3) Retrieved work order - all data persisted correctly, (4) Multiple sequential updates work consistently, (5) Final verification shows 5 items with 3 completed. Backend logs show all PUT /api/work-orders/{id} requests returning 200 OK. Data integrity verified: completed tasks retain user ID and timestamp, uncompleted tasks have no completion data. The backend checklist functionality is fully operational."
 
 ## frontend:
   - task: "Pricing page component"
