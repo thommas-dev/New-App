@@ -20,6 +20,9 @@ function MaintenanceWorkOrders({ user }) {
   const [selectedTask, setSelectedTask] = useState(null);
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [maintenanceTasks, setMaintenanceTasks] = useState(null);
+  const [workOrders, setWorkOrders] = useState([]);
+
+  const API = process.env.REACT_APP_BACKEND_URL;
 
   const maintenanceTypes = [
     {
