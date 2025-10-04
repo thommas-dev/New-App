@@ -97,7 +97,7 @@ function DailyTasks({ user }) {
         { id: '3-3', text: 'Lubricate bearings', completed: true }
       ]
     }
-  ]);
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
