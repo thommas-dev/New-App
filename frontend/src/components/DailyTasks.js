@@ -279,12 +279,7 @@ function DailyTasks({ user }) {
                       <Checkbox 
                         size="sm" 
                         checked={isCompleted}
-                        disabled={task.status === 'completed'}
-                        onCheckedChange={(checked) => {
-                          const fakeEvent = { stopPropagation: () => {} };
-                          handleChecklistToggle(task.id, itemId, checked, fakeEvent);
-                        }}
-                        onClick={(event) => event.stopPropagation()}
+                        disabled={true}
                       />
                       <span className={`text-xs ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-700'}`}>
                         {typeof item === 'string' ? item : (item?.text || item)}
