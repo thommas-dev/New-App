@@ -315,7 +315,10 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
   };
 
   const removeChecklistItem = (itemId) => {
-    setChecklist(prev => prev.filter(item => item.id !== itemId));
+    const updatedChecklist = checklist.filter(item => item.id !== itemId);
+    setChecklist(updatedChecklist);
+    // Save draft to localStorage
+    localStorage.setItem(cacheKey, JSON.stringify(updatedChecklist));
     toast.success('Checklist item removed');
   };
 
