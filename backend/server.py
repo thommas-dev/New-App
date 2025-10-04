@@ -405,6 +405,34 @@ async def get_departments(current_user: User = Depends(get_current_user_with_acc
     departments = await db.departments.find().to_list(length=None)
     return [Department(**parse_from_mongo(dept)) for dept in departments]
 
+@api_router.put("/departments/{dept_id}", response_model=Department)
+async def update_department(dept_id: str, department_data: DepartmentCreate, current_user: User = Depends(get_current_user_with_access)):
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Only admins can update departments")
+    
+    # Check if department exists
+    existing_dept = await db.departments.find_one({"id": dept_id})
+    if not existing_dept:
+        raise HTTPException(status_code=404, detail="Department not found")
+    
+    # Update department
+    update_data = prepare_for_mongo({
+        "name": department_data.name,
+        "updated_at": datetime.now(timezone.utc)
+    })
+    
+    result = await db.departments.update_one(
+        {"id": dept_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Department not found")
+    
+    # Return updated department
+    updated_dept = await db.departments.find_one({"id": dept_id})
+    return Department(**parse_from_mongo(updated_dept))
+
 @api_router.delete("/departments/{dept_id}")
 async def delete_department(dept_id: str, current_user: User = Depends(get_current_user_with_access)):
     if current_user.role != UserRole.ADMIN:
