@@ -296,17 +296,13 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
           checklist: checklist
         });
         
-        // Success if no error thrown
-          // Trigger cross-page synchronization
-          const updateEvent = new CustomEvent('workOrderUpdated', {
-            detail: { workOrderId: task.id, checklist: checklist }
-          });
-          window.dispatchEvent(updateEvent);
-          
-          toast.success('Checklist saved successfully to database!');
-        } else {
-          throw new Error('Save failed');
-        }
+        // Trigger cross-page synchronization
+        const updateEvent = new CustomEvent('workOrderUpdated', {
+          detail: { workOrderId: task.id, checklist: checklist }
+        });
+        window.dispatchEvent(updateEvent);
+        
+        toast.success('Checklist saved successfully to database!');
       } else {
         // This is sample maintenance task data - just show message
         toast.success('Sample maintenance task updated locally!');
