@@ -348,6 +348,179 @@ class BackendTester:
             self.log_result("Payment Transactions DB", False, 
                           "No checkout session created to verify transaction storage")
             
+    async def test_work_order_checklist_update(self):
+        """Test work order checklist update functionality - MAIN FOCUS"""
+        print("\n=== Testing Work Order Checklist Update (MAIN FOCUS) ===")
+        
+        if not self.auth_token:
+            self.log_result("Checklist Update", False, "No auth token available")
+            return
+            
+        # First, create a work order to test with
+        work_order_data = {
+            "title": "Test Checklist Work Order",
+            "type": "PM",
+            "priority": "Medium",
+            "description": "Testing checklist update functionality",
+            "checklist_items": ["Initial task 1", "Initial task 2"]
+        }
+        
+        success, response, status = await self.make_request(
+            "POST", "/work-orders", work_order_data, expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Work Order Creation for Checklist Test", False, 
+                          f"Failed to create work order: {response}", status)
+            return
+            
+        work_order_id = response.get("id")
+        if not work_order_id:
+            self.log_result("Work Order ID Extraction", False, 
+                          "No work order ID in response", response)
+            return
+            
+        self.log_result("Work Order Creation for Checklist Test", True, 
+                      f"Created work order {work_order_id} for testing")
+        
+        # Test 1: Update checklist with new items
+        print("\n--- Test 1: Update checklist with new items ---")
+        updated_checklist = [
+            {
+                "id": "item1",
+                "text": "Updated task 1",
+                "completed": False
+            },
+            {
+                "id": "item2", 
+                "text": "Updated task 2",
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "item3",
+                "text": "New task 3", 
+                "completed": False
+            }
+        ]
+        
+        update_data = {"checklist": updated_checklist}
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", update_data, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            if len(returned_checklist) == 3:
+                self.log_result("Checklist Update - New Items", True, 
+                              "Successfully updated checklist with 3 items")
+                
+                # Verify checklist item structure
+                item1 = returned_checklist[0]
+                item2 = returned_checklist[1] 
+                
+                if (item1.get("text") == "Updated task 1" and 
+                    item2.get("completed") == True and
+                    item2.get("completed_by") == self.user_id):
+                    self.log_result("Checklist Item Structure", True,
+                                  "Checklist items have correct structure and data")
+                else:
+                    self.log_result("Checklist Item Structure", False,
+                                  "Checklist items missing expected data", returned_checklist)
+            else:
+                self.log_result("Checklist Update - New Items", False,
+                              f"Expected 3 items, got {len(returned_checklist)}", returned_checklist)
+        else:
+            self.log_result("Checklist Update - New Items", False,
+                          f"Failed to update checklist: {response}", status)
+            
+        # Test 2: Update with empty checklist
+        print("\n--- Test 2: Update with empty checklist ---")
+        empty_update = {"checklist": []}
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", empty_update, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            if len(returned_checklist) == 0:
+                self.log_result("Checklist Update - Empty List", True,
+                              "Successfully updated with empty checklist")
+            else:
+                self.log_result("Checklist Update - Empty List", False,
+                              f"Expected empty list, got {len(returned_checklist)} items")
+        else:
+            self.log_result("Checklist Update - Empty List", False,
+                          f"Failed to update with empty checklist: {response}", status)
+            
+        # Test 3: Update with malformed checklist data
+        print("\n--- Test 3: Update with malformed checklist data ---")
+        malformed_checklist = [
+            {
+                "text": "Missing ID field",
+                "completed": False
+            },
+            {
+                "id": "valid_item",
+                "text": "Valid item",
+                "completed": True
+            }
+        ]
+        
+        malformed_update = {"checklist": malformed_checklist}
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", malformed_update, expect_status=200
+        )
+        
+        if success:
+            self.log_result("Checklist Update - Malformed Data", True,
+                          "Backend accepts checklist items without ID (auto-generated)")
+        else:
+            # Check if it's a validation error (expected)
+            if status == 422:
+                self.log_result("Checklist Update - Malformed Data", True,
+                              "Backend properly validates checklist structure (422 error)")
+            else:
+                self.log_result("Checklist Update - Malformed Data", False,
+                              f"Unexpected error with malformed data: {response}", status)
+                
+        # Test 4: Test authentication requirement
+        print("\n--- Test 4: Test authentication requirement ---")
+        old_token = self.auth_token
+        self.auth_token = None  # Remove auth token
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", {"checklist": []}, expect_status=401
+        )
+        
+        if status == 401:
+            self.log_result("Checklist Update - Authentication Required", True,
+                          "Properly requires authentication for checklist updates")
+        else:
+            self.log_result("Checklist Update - Authentication Required", False,
+                          f"Should require auth, got status {status}: {response}")
+            
+        self.auth_token = old_token  # Restore auth token
+        
+        # Test 5: Test with non-existent work order
+        print("\n--- Test 5: Test with non-existent work order ---")
+        fake_id = "non-existent-work-order-id"
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{fake_id}", {"checklist": []}, expect_status=404
+        )
+        
+        if status == 404:
+            self.log_result("Checklist Update - Non-existent WO", True,
+                          "Properly returns 404 for non-existent work order")
+        else:
+            self.log_result("Checklist Update - Non-existent WO", False,
+                          f"Should return 404, got status {status}: {response}")
+
     async def simulate_expired_trial_user(self):
         """Create a user with expired trial for testing access control"""
         print("\n=== Testing Expired Trial Access Control ===")
