@@ -264,9 +264,7 @@
 
 ## test_plan:
   current_focus:
-    - "Trial expiration logic"
-    - "Payment models and endpoints"
-    - "Access control middleware"
+    - "Work order checklist update functionality"
     - "Pricing page component"
     - "Payment success page"
   stuck_tasks: []
