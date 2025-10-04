@@ -98,12 +98,14 @@ function DepartmentManagement({ user }) {
     setSelectedDepartment(department);
   };
 
-  const handleDepartmentUpdate = (updatedDepartment) => {
+  const handleDepartmentUpdate = async (updatedDepartment) => {
     setDepartments(prevDepartments =>
       prevDepartments.map(dept =>
         dept.id === updatedDepartment.id ? updatedDepartment : dept
       )
     );
+    // Refresh machines list to update counts
+    await fetchMachines();
     setSelectedDepartment(null);
   };
 
