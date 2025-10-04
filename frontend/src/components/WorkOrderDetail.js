@@ -145,6 +145,12 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
         checklist: checklist
       });
       
+      // Trigger cross-page synchronization
+      const updateEvent = new CustomEvent('workOrderUpdated', {
+        detail: { workOrderId: workOrder.id, checklist: checklist }
+      });
+      window.dispatchEvent(updateEvent);
+      
       toast.success('Checklist saved successfully!');
       
       // Don't call onUpdate to prevent modal from closing
