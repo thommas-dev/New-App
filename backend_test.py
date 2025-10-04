@@ -12,7 +12,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Dict, Any, Optional
 
 # Configuration
-BASE_URL = "https://pmtool.preview.emergentagent.com/api"
+BASE_URL = "https://equiptrack-16.preview.emergentagent.com/api"
 TIMESTAMP = str(int(time.time()))
 TEST_USER_DATA = {
     "username": f"trial_test_user_{TIMESTAMP}",
@@ -240,7 +240,7 @@ class BackendTester:
             
         checkout_data = {
             "package_id": "monthly",
-            "origin_url": "https://pmtool.preview.emergentagent.com"
+            "origin_url": "https://equiptrack-16.preview.emergentagent.com"
         }
         
         success, response, status = await self.make_request(

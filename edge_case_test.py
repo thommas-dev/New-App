@@ -10,7 +10,7 @@ import json
 import time
 from datetime import datetime, timezone, timedelta
 
-BASE_URL = "https://pmtool.preview.emergentagent.com/api"
+BASE_URL = "https://equiptrack-16.preview.emergentagent.com/api"
 
 async def test_edge_cases():
     """Test edge cases that might cause user-reported failures"""
@@ -49,7 +49,7 @@ async def test_edge_cases():
         headers = {
             "Access-Control-Request-Method": "GET",
             "Access-Control-Request-Headers": "authorization,content-type",
-            "Origin": "https://pmtool.preview.emergentagent.com"
+            "Origin": "https://equiptrack-16.preview.emergentagent.com"
         }
         
         async with session.options(f"{BASE_URL}/work-orders", headers=headers) as response:

@@ -11,7 +11,7 @@ import time
 from datetime import datetime, timezone
 
 # Configuration
-BASE_URL = "https://pmtool.preview.emergentagent.com/api"
+BASE_URL = "https://equiptrack-16.preview.emergentagent.com/api"
 TIMESTAMP = str(int(time.time()))
 
 async def test_checklist_update_scenarios():
