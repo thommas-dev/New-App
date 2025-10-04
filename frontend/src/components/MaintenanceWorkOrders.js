@@ -168,6 +168,47 @@ function MaintenanceWorkOrders({ user }) {
     setMaintenanceTasks(null);
   };
 
+  // Fetch real work orders and setup cross-page synchronization
+  React.useEffect(() => {
+    const fetchWorkOrders = async () => {
+      try {
+        const response = await fetch(`${API}/api/work-orders`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setWorkOrders(data);
+        }
+      } catch (error) {
+        console.error('Error fetching work orders:', error);
+      }
+    };
+
+    fetchWorkOrders();
+
+    // Listen for work order updates from other pages
+    const handleWorkOrderUpdate = (event) => {
+      const { workOrderId, checklist } = event.detail;
+      setWorkOrders(prevOrders =>
+        prevOrders.map(wo =>
+          wo.id === workOrderId
+            ? { ...wo, checklist: checklist }
+            : wo
+        )
+      );
+    };
+
+    window.addEventListener('workOrderUpdated', handleWorkOrderUpdate);
+    
+    // Cleanup listener
+    return () => {
+      window.removeEventListener('workOrderUpdated', handleWorkOrderUpdate);
+    };
+  }, [API]);
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       pending: { color: 'bg-yellow-100 text-yellow-800', text: 'Pending' },
