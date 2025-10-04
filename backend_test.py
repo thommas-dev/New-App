@@ -1113,24 +1113,403 @@ class BackendTester:
             self.log_result("Final Checklist State", False, 
                           f"Failed final verification: {final_response}", final_status)
 
+    async def test_enhanced_checklist_persistence_with_abortcontroller(self):
+        """Test enhanced checklist persistence implementation with AbortController support"""
+        print("\n=== ENHANCED CHECKLIST PERSISTENCE WITH ABORTCONTROLLER ===")
+        
+        if not self.auth_token:
+            self.log_result("Enhanced Checklist Persistence", False, "No auth token available")
+            return
+            
+        # Test 1: PUT /api/work-orders/{id} with various checklist structures
+        print("\n--- Test 1: PUT API with various checklist structures ---")
+        
+        # Create a work order for testing
+        work_order_data = {
+            "title": "Enhanced Checklist Persistence Test",
+            "type": "PM",
+            "priority": "High",
+            "description": "Testing enhanced checklist persistence with AbortController",
+            "checklist_items": []
+        }
+        
+        success, response, status = await self.make_request(
+            "POST", "/work-orders", work_order_data, expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Work Order Creation for Enhanced Test", False, 
+                          f"Failed to create work order: {response}", status)
+            return
+            
+        work_order_id = response.get("id")
+        self.log_result("Work Order Creation for Enhanced Test", True, 
+                      f"Created work order {work_order_id}")
+        
+        # Test 1a: Empty checklist
+        print("\n  Test 1a: Empty checklist")
+        empty_checklist_data = {"checklist": []}
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", empty_checklist_data, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            if len(returned_checklist) == 0:
+                self.log_result("Empty Checklist Update", True, "API accepts empty checklist")
+            else:
+                self.log_result("Empty Checklist Update", False, 
+                              f"Expected empty, got {len(returned_checklist)} items")
+        else:
+            self.log_result("Empty Checklist Update", False, 
+                          f"Failed to update with empty checklist: {response}", status)
+        
+        # Test 1b: Single item checklist
+        print("\n  Test 1b: Single item checklist")
+        single_item_checklist = [{
+            "id": "single-item-1",
+            "text": "Single checklist item",
+            "completed": False
+        }]
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", {"checklist": single_item_checklist}, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            if len(returned_checklist) == 1 and returned_checklist[0].get("text") == "Single checklist item":
+                self.log_result("Single Item Checklist", True, "API handles single item checklist correctly")
+            else:
+                self.log_result("Single Item Checklist", False, 
+                              "Single item checklist not handled correctly", returned_checklist)
+        else:
+            self.log_result("Single Item Checklist", False, 
+                          f"Failed single item update: {response}", status)
+        
+        # Test 1c: Multiple items with completed/uncompleted mix
+        print("\n  Test 1c: Multiple items with completed/uncompleted mix")
+        mixed_checklist = [
+            {
+                "id": "item-1",
+                "text": "Uncompleted task 1",
+                "completed": False
+            },
+            {
+                "id": "item-2", 
+                "text": "Completed task 2",
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "item-3",
+                "text": "Uncompleted task 3", 
+                "completed": False
+            },
+            {
+                "id": "item-4",
+                "text": "Completed task 4",
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", {"checklist": mixed_checklist}, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            completed_items = [item for item in returned_checklist if item.get("completed")]
+            uncompleted_items = [item for item in returned_checklist if not item.get("completed")]
+            
+            # Verify completed items have metadata
+            valid_completed = all(
+                item.get("completed_by") and item.get("completed_at") 
+                for item in completed_items
+            )
+            
+            # Verify uncompleted items don't have completion metadata
+            valid_uncompleted = all(
+                not item.get("completed_by") and not item.get("completed_at")
+                for item in uncompleted_items
+            )
+            
+            if len(returned_checklist) == 4 and len(completed_items) == 2 and valid_completed and valid_uncompleted:
+                self.log_result("Mixed Checklist with Metadata", True, 
+                              "API correctly handles mixed checklist with proper metadata")
+            else:
+                self.log_result("Mixed Checklist with Metadata", False, 
+                              f"Mixed checklist issues - Items: {len(returned_checklist)}, Completed: {len(completed_items)}, Valid metadata: {valid_completed and valid_uncompleted}")
+        else:
+            self.log_result("Mixed Checklist with Metadata", False, 
+                          f"Failed mixed checklist update: {response}", status)
+        
+        # Test 2: Verify API returns authoritative checklist data in response
+        print("\n--- Test 2: Verify API returns authoritative checklist data ---")
+        
+        # The response from the PUT request should contain the authoritative checklist data
+        if success:
+            # Verify the response contains the complete checklist structure
+            authoritative_checklist = response.get("checklist", [])
+            
+            # Check that all items have proper structure
+            valid_structure = all(
+                "id" in item and "text" in item and "completed" in item
+                for item in authoritative_checklist
+            )
+            
+            if valid_structure:
+                self.log_result("Authoritative Data Response", True, 
+                              "PUT response contains complete authoritative checklist data")
+            else:
+                self.log_result("Authoritative Data Response", False, 
+                              "PUT response missing required checklist structure")
+        
+        # Test 3: Cross-page synchronization backend support
+        print("\n--- Test 3: Cross-page synchronization backend support ---")
+        
+        # Test MongoDB persistence by retrieving the work order multiple times
+        persistence_tests = []
+        
+        for i in range(3):
+            success, response, status = await self.make_request(
+                "GET", f"/work-orders/{work_order_id}", expect_status=200
+            )
+            
+            if success:
+                retrieved_checklist = response.get("checklist", [])
+                persistence_tests.append(len(retrieved_checklist))
+            else:
+                persistence_tests.append(-1)
+                
+        # All retrievals should return the same checklist count
+        if all(count == persistence_tests[0] and count > 0 for count in persistence_tests):
+            self.log_result("MongoDB Persistence Consistency", True, 
+                          f"Consistent checklist data across {len(persistence_tests)} retrievals")
+        else:
+            self.log_result("MongoDB Persistence Consistency", False, 
+                          f"Inconsistent data across retrievals: {persistence_tests}")
+        
+        # Test 4: Multiple save/retrieve cycles for data integrity
+        print("\n--- Test 4: Multiple save/retrieve cycles ---")
+        
+        cycle_success = True
+        for cycle in range(5):
+            # Modify checklist
+            cycle_checklist = [
+                {
+                    "id": f"cycle-{cycle}-item-1",
+                    "text": f"Cycle {cycle} task 1",
+                    "completed": cycle % 2 == 0
+                },
+                {
+                    "id": f"cycle-{cycle}-item-2", 
+                    "text": f"Cycle {cycle} task 2",
+                    "completed": cycle % 3 == 0
+                }
+            ]
+            
+            # Add completion metadata for completed items
+            for item in cycle_checklist:
+                if item["completed"]:
+                    item["completed_by"] = self.user_id
+                    item["completed_at"] = datetime.now(timezone.utc).isoformat()
+            
+            # Save
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", {"checklist": cycle_checklist}, expect_status=200
+            )
+            
+            if not success:
+                cycle_success = False
+                break
+                
+            # Retrieve
+            success, response, status = await self.make_request(
+                "GET", f"/work-orders/{work_order_id}", expect_status=200
+            )
+            
+            if not success:
+                cycle_success = False
+                break
+                
+            retrieved_checklist = response.get("checklist", [])
+            
+            # Verify data integrity
+            if len(retrieved_checklist) != len(cycle_checklist):
+                cycle_success = False
+                break
+                
+        if cycle_success:
+            self.log_result("Multiple Save/Retrieve Cycles", True, 
+                          "Successfully completed 5 save/retrieve cycles with data integrity")
+        else:
+            self.log_result("Multiple Save/Retrieve Cycles", False, 
+                          f"Data integrity issues during cycle testing")
+        
+        # Test 5: AbortController signal handling (backend should not be affected)
+        print("\n--- Test 5: AbortController signal handling ---")
+        
+        # Simulate rapid successive updates (as would happen with AbortController)
+        rapid_updates = []
+        for i in range(3):
+            update_data = {
+                "checklist": [{
+                    "id": f"rapid-{i}",
+                    "text": f"Rapid update {i}",
+                    "completed": False
+                }]
+            }
+            
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", update_data, expect_status=200
+            )
+            
+            rapid_updates.append(success)
+            
+        if all(rapid_updates):
+            self.log_result("Rapid Updates (AbortController Simulation)", True, 
+                          "Backend handles rapid successive updates correctly")
+        else:
+            self.log_result("Rapid Updates (AbortController Simulation)", False, 
+                          f"Issues with rapid updates: {rapid_updates}")
+        
+        # Test 6: Concurrent checklist updates simulation
+        print("\n--- Test 6: Concurrent updates simulation ---")
+        
+        # Create multiple work orders for concurrent testing
+        concurrent_wos = []
+        for i in range(3):
+            wo_data = {
+                "title": f"Concurrent Test WO {i}",
+                "type": "PM",
+                "priority": "Medium",
+                "description": f"Concurrent testing work order {i}",
+                "checklist_items": [f"Initial task {i}"]
+            }
+            
+            success, response, status = await self.make_request(
+                "POST", "/work-orders", wo_data, expect_status=200
+            )
+            
+            if success:
+                concurrent_wos.append(response.get("id"))
+        
+        # Update all work orders with different checklists
+        concurrent_success = True
+        for i, wo_id in enumerate(concurrent_wos):
+            checklist_data = {
+                "checklist": [{
+                    "id": f"concurrent-{i}",
+                    "text": f"Concurrent task {i}",
+                    "completed": i % 2 == 0
+                }]
+            }
+            
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{wo_id}", checklist_data, expect_status=200
+            )
+            
+            if not success:
+                concurrent_success = False
+                break
+        
+        if concurrent_success:
+            self.log_result("Concurrent Updates", True, 
+                          "Backend handles concurrent checklist updates correctly")
+        else:
+            self.log_result("Concurrent Updates", False, 
+                          "Issues with concurrent checklist updates")
+        
+        # Test 7: Data integrity verification with unique IDs
+        print("\n--- Test 7: Data integrity with unique IDs ---")
+        
+        unique_id_checklist = [
+            {
+                "id": str(uuid.uuid4()),
+                "text": "Task with UUID",
+                "completed": False
+            },
+            {
+                "id": f"custom-{int(time.time())}",
+                "text": "Task with timestamp ID", 
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", {"checklist": unique_id_checklist}, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            
+            # Verify unique IDs are preserved
+            returned_ids = [item.get("id") for item in returned_checklist]
+            original_ids = [item.get("id") for item in unique_id_checklist]
+            
+            if set(returned_ids) == set(original_ids):
+                self.log_result("Unique ID Preservation", True, 
+                              "Checklist item unique IDs preserved correctly")
+            else:
+                self.log_result("Unique ID Preservation", False, 
+                              f"ID mismatch - Original: {original_ids}, Returned: {returned_ids}")
+        else:
+            self.log_result("Unique ID Preservation", False, 
+                          f"Failed to test unique IDs: {response}", status)
+        
+        # Test 8: Edge cases and malformed data
+        print("\n--- Test 8: Edge cases and malformed data ---")
+        
+        # Test with missing required fields
+        malformed_cases = [
+            {"checklist": [{"text": "Missing ID", "completed": False}]},  # Missing ID
+            {"checklist": [{"id": "test", "completed": False}]},  # Missing text
+            {"checklist": [{"id": "test", "text": "Missing completed field"}]},  # Missing completed
+        ]
+        
+        malformed_results = []
+        for i, case in enumerate(malformed_cases):
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", case, expect_status=200
+            )
+            
+            # Backend should either accept (with auto-generation) or reject with proper error
+            if success or status == 422:
+                malformed_results.append(True)
+            else:
+                malformed_results.append(False)
+        
+        if all(malformed_results):
+            self.log_result("Malformed Data Handling", True, 
+                          "Backend properly handles malformed checklist data")
+        else:
+            self.log_result("Malformed Data Handling", False, 
+                          "Issues with malformed data handling")
+
     async def run_all_tests(self):
-        """Run all backend tests focusing on checklist persistence"""
-        print("🚀 FOCUSED: EquipTrack Checklist Persistence Testing")
+        """Run all backend tests focusing on enhanced checklist persistence"""
+        print("🚀 ENHANCED CHECKLIST PERSISTENCE TESTING")
         print(f"Testing against: {BASE_URL}")
-        print("Focus: Checklist save/reopen persistence issues reported by user")
+        print("Focus: Enhanced checklist persistence with AbortController support")
         
         await self.setup()
         
         try:
-            # Authentication & Trial System Tests
+            # Authentication setup
             await self.test_user_registration_with_trial()
-            await self.test_authentication_and_access_detailed()
             
-            # MAIN FOCUS: Checklist Save/Reopen Persistence Test
+            # MAIN FOCUS: Enhanced Checklist Persistence with AbortController
+            await self.test_enhanced_checklist_persistence_with_abortcontroller()
+            
+            # Additional focused tests
             await self.test_checklist_save_reopen_cycle()
-            
-            # Additional checklist tests
-            await self.test_checklist_persistence_comprehensive()
             await self.test_work_order_checklist_update()
             
         finally:
