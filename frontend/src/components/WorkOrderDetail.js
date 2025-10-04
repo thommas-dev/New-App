@@ -147,9 +147,8 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       
       toast.success('Checklist saved successfully!');
       
-      if (onUpdate) {
-        onUpdate({ ...workOrder, checklist });
-      }
+      // Don't call onUpdate to prevent modal from closing
+      // Parent component will refresh data when modal is actually closed
     } catch (error) {
       console.error('Failed to save checklist:', error);
       toast.error('Failed to save checklist');
