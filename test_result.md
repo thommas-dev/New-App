@@ -180,6 +180,21 @@
         agent: "testing"
         comment: "✅ VERIFIED: Stripe webhook endpoint working correctly. /api/webhook/stripe endpoint exists and handles webhook requests properly. Returns {'received': True} response indicating successful webhook processing. Uses emergentintegrations library for webhook handling."
 
+  - task: "Work order checklist update functionality"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "user"
+        comment: "User reported 'Failed to save checklist' error in frontend. Need to test backend checklist update functionality."
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Work order checklist update functionality working correctly. PUT /api/work-orders/{id} endpoint successfully accepts and saves checklist data. Tested with: (1) New checklist items with proper structure, (2) Empty checklist updates, (3) Malformed data handling, (4) Authentication requirements, (5) Non-existent work order handling. WorkOrderUpdate model properly accepts checklist field as Optional[List[WorkOrderChecklistItem]]. Backend logs show 200 OK responses for all valid checklist updates. The 'Failed to save checklist' error is likely a frontend issue, not backend."
+
 ## frontend:
   - task: "Pricing page component"
     implemented: true
