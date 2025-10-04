@@ -58,11 +58,12 @@ function DailyTasks({ user }) {
       // Show work orders that are not completed
       return wo.status !== 'Completed';
     }),
+    // Add some sample maintenance tasks
     {
-      id: 1,
+      id: 'maintenance-1',
       title: 'Oil Level Check - CNC Machine 01',
       type: 'maintenance',
-      scheduledTime: '08:00',
+      scheduledTime: '09:00',
       department: 'Production',
       machine: 'CNC Machine 01',
       assignee: 'John Smith',
@@ -79,33 +80,7 @@ function DailyTasks({ user }) {
       ]
     },
     {
-      id: 2,
-      wo_id: 'WO-2025-0003',
-      title: 'Replace conveyor belt',
-      type: 'repair',
-      scheduledTime: '14:00',
-      department: 'Production',
-      department_name: 'Production',
-      machine: 'Conveyor Belt A',
-      machine_name: 'Conveyor Belt A',
-      assignee: 'Mike Johnson',
-      assignee_name: 'Mike Johnson',
-      requested_by_name: 'admin2',
-      priority: 'Critical',
-      status: 'in-progress',
-      overdue: true,
-      description: 'Emergency conveyor belt replacement due to mechanical failure.',
-      created_at: new Date().toISOString(),
-      checklist: [
-        { id: '2-1', text: 'Shut down production line', completed: true },
-        { id: '2-2', text: 'Remove old belt', completed: false },
-        { id: '2-3', text: 'Install new belt', completed: false },
-        { id: '2-4', text: 'Test operation', completed: false }
-      ],
-      tags: ['urgent', 'production']
-    },
-    {
-      id: 3,
+      id: 'maintenance-2',
       title: 'Conveyor Belt Inspection',
       type: 'maintenance',
       scheduledTime: '10:30',
@@ -115,33 +90,11 @@ function DailyTasks({ user }) {
       priority: 'Medium',
       status: 'completed',
       overdue: false,
-      frequency: 'Daily',
-      notes: 'Daily visual inspection of conveyor belt system for wear and proper operation.',
-      safety_notes: 'Use lockout/tagout procedures before inspection.',
+      frequency: 'Weekly',
       checklist: [
-        { id: '3-1', text: 'Visual inspection', completed: true, created_by: 'System', created_at: new Date().toISOString() },
-        { id: '3-2', text: 'Check tension', completed: true, created_by: 'System', created_at: new Date().toISOString() },
-        { id: '3-3', text: 'Clean belt surface', completed: true, created_by: 'System', created_at: new Date().toISOString() }
-      ]
-    },
-    {
-      id: 4,
-      title: 'Safety System Check',
-      type: 'maintenance',
-      scheduledTime: '16:00',
-      department: 'Safety',
-      machine: 'Emergency Stops',
-      assignee: 'Tom Wilson',
-      priority: 'High',
-      status: 'pending',
-      overdue: false,
-      frequency: 'Daily',
-      notes: 'Daily safety system verification and testing.',
-      safety_notes: 'Follow safety protocols when testing emergency systems.',
-      checklist: [
-        { id: '4-1', text: 'Test all emergency stops', completed: false, created_by: 'System', created_at: new Date().toISOString() },
-        { id: '4-2', text: 'Check alarm systems', completed: false, created_by: 'System', created_at: new Date().toISOString() },
-        { id: '4-3', text: 'Verify safety protocols', completed: false, created_by: 'System', created_at: new Date().toISOString() }
+        { id: '3-1', text: 'Visual inspection', completed: true },
+        { id: '3-2', text: 'Check tension', completed: true },
+        { id: '3-3', text: 'Lubricate bearings', completed: true }
       ]
     }
   ]);
