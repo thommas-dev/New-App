@@ -51,6 +51,25 @@ function DailyTasks({ user }) {
     };
 
     fetchWorkOrders();
+
+    // Listen for work order updates from other pages
+    const handleWorkOrderUpdate = (event) => {
+      const { workOrderId, checklist } = event.detail;
+      setWorkOrders(prevOrders =>
+        prevOrders.map(wo =>
+          wo.id === workOrderId
+            ? { ...wo, checklist: checklist }
+            : wo
+        )
+      );
+    };
+
+    window.addEventListener('workOrderUpdated', handleWorkOrderUpdate);
+    
+    // Cleanup listener
+    return () => {
+      window.removeEventListener('workOrderUpdated', handleWorkOrderUpdate);
+    };
   }, [API]);
 
   // Filter work orders for today's tasks and add sample maintenance tasks
