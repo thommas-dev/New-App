@@ -156,6 +156,11 @@ function DailyTasks({ user }) {
   };
 
   const isTaskUpcoming = (timeString) => {
+    // Handle undefined or invalid timeString
+    if (!timeString || typeof timeString !== 'string' || !timeString.includes(':')) {
+      return false;
+    }
+    
     const [hour, minute] = timeString.split(':');
     const taskTime = new Date();
     taskTime.setHours(parseInt(hour), parseInt(minute), 0, 0);
