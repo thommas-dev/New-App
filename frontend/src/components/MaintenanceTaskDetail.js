@@ -323,33 +323,74 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
   };
 
   const saveChecklistChanges = async () => {
+    // Prevent multiple simultaneous saves
+    if (isChecklistSaving) return;
+    
+    setIsChecklistSaving(true);
+    
     try {
+      // Cancel any previous save request
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+      
+      // Create new AbortController for this request
+      abortRef.current = new AbortController();
+      
       // Check if this is a real work order (has wo_id) or sample maintenance task
       if (task.wo_id || task.id) {
         // This is a real work order - save to backend
-        const API = process.env.REACT_APP_BACKEND_URL;
+        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+        const API = `${BACKEND_URL}/api`;
         
-        await axios.put(`${API}/api/work-orders/${task.id}`, {
+        const response = await axios.put(`${API}/work-orders/${task.id}`, {
           checklist: checklist
+        }, {
+          signal: abortRef.current.signal
         });
         
-        // Trigger cross-page synchronization
+        // Use authoritative data from backend response
+        const savedChecklist = response.data.checklist || checklist;
+        setChecklist(savedChecklist);
+        
+        // Clear localStorage draft after successful save
+        localStorage.removeItem(cacheKey);
+        
+        // Trigger cross-page synchronization with authoritative data
         const updateEvent = new CustomEvent('workOrderUpdated', {
-          detail: { workOrderId: task.id, checklist: checklist }
+          detail: { workOrderId: task.id, checklist: savedChecklist }
         });
         window.dispatchEvent(updateEvent);
         
         toast.success('Checklist saved successfully to database!');
       } else {
-        // This is sample maintenance task data - just show message
+        // This is sample maintenance task data - save to localStorage with expiry
+        const savedData = {
+          checklist: checklist,
+          timestamp: Date.now(),
+          taskId: task.id || 'sample'
+        };
+        localStorage.setItem(`equiptrack:sample:${task.id || 'default'}`, JSON.stringify(savedData));
+        
+        // Clear draft since we've saved it
+        localStorage.removeItem(cacheKey);
+        
         toast.success('Sample maintenance task updated locally!');
       }
       
       // Don't call onUpdate to prevent modal from closing
       // Parent component will refresh data when modal is actually closed
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Save request was aborted');
+        return; // Don't show error for aborted requests
+      }
+      
       console.error('Failed to save checklist:', error);
       toast.error('Failed to save checklist');
+    } finally {
+      setIsChecklistSaving(false);
+      abortRef.current = null;
     }
   };
 
