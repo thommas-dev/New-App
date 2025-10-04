@@ -282,11 +282,11 @@
 
   - task: "Frontend checklist persistence"
     implemented: true
-    working: true
-    file: "WorkOrderDetail.js"
-    stuck_count: 0
+    working: false
+    file: "WorkOrderDetail.js, MaintenanceTaskDetail.js"
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "user"
@@ -294,6 +294,12 @@
       - working: true
         agent: "testing"
         comment: "✅ CHECKLIST PERSISTENCE VERIFIED: Comprehensive end-to-end testing confirms checklist functionality working perfectly. Test results: (1) ✅ Work order modal opens with checklist tab, (2) ✅ Can add new checklist items, (3) ✅ Save functionality works with 'Checklist saved successfully!' message, (4) ✅ Existing items can be toggled, (5) ✅ Progress indicators update correctly, (6) ✅ Changes persist across modal open/close. Complete checklist workflow from frontend to backend is fully operational."
+      - working: false
+        agent: "user"
+        comment: "User provided detailed technical analysis identifying 3 root causes: (1) Save requests being aborted when modals unmount, (2) Cache key collisions leading to stale data, (3) API not returning authoritative saved items. User provided comprehensive solution examples including AbortController usage, unique cache keys, and proper state management."
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented comprehensive checklist persistence fix based on user's detailed technical analysis. Added: (1) AbortController to prevent premature abortion of save requests, (2) Unique cache keys per page+card (equiptrack:checklist:kanban:{id} and equiptrack:checklist:maintenance:{id}), (3) localStorage draft management for recovery, (4) Authoritative data handling from backend response, (5) Proper save state management with loading indicators, (6) Modal close blocking during saves and unsaved change detection. Applied to both WorkOrderDetail.js and MaintenanceTaskDetail.js."
 
 ## metadata:
   created_by: "main_agent"
