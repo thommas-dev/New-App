@@ -34,6 +34,7 @@ const API = `${BACKEND_URL}/api`;
 function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     title: workOrder.title,
     priority: workOrder.priority,
