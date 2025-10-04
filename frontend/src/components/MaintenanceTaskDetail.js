@@ -429,7 +429,13 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={onClose}
+                onClick={() => {
+                  if (onUpdate) {
+                    // Refresh parent data when closing
+                    onUpdate({ ...task, checklist });
+                  }
+                  onClose();
+                }}
                 className="h-8 w-8 p-0"
                 data-testid="close-maintenance-task-detail"
               >
