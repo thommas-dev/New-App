@@ -751,27 +751,25 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                 )}
 
                 {/* Add new checklist item */}
-                {checklistEditMode && (
-                  <div className="flex space-x-2 p-4 bg-blue-50 rounded-lg">
-                    <Input
-                      type="text"
-                      placeholder="Add new checklist item"
-                      value={newChecklistItem}
-                      onChange={(e) => setNewChecklistItem(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && addChecklistItem()}
-                      className="flex-1"
-                      data-testid="new-wo-checklist-item"
-                    />
-                    <Button
-                      onClick={addChecklistItem}
-                      disabled={!newChecklistItem.trim()}
-                      size="sm"
-                      data-testid="add-wo-checklist-item"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
-                  </div>
-                )}
+                <div className="flex space-x-2 p-4 bg-blue-50 rounded-lg">
+                  <Input
+                    type="text"
+                    placeholder="Add new checklist item (e.g., Check oil levels, Inspect belts)"
+                    value={newChecklistItem}
+                    onChange={(e) => setNewChecklistItem(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && addChecklistItem()}
+                    className="flex-1"
+                    data-testid="new-wo-checklist-item"
+                  />
+                  <Button
+                    onClick={addChecklistItem}
+                    disabled={!newChecklistItem.trim()}
+                    size="sm"
+                    data-testid="add-wo-checklist-item"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
 
                 <div className="space-y-3">
                   {checklist.map((item, index) => (
