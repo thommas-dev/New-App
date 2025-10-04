@@ -145,6 +145,11 @@ function DailyTasks({ user }) {
   };
 
   const formatTime = (timeString) => {
+    // Handle undefined or invalid timeString
+    if (!timeString || typeof timeString !== 'string' || !timeString.includes(':')) {
+      return 'Time not set';
+    }
+    
     const [hour, minute] = timeString.split(':');
     const date = new Date();
     date.setHours(parseInt(hour), parseInt(minute));
