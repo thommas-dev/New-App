@@ -102,7 +102,7 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   };
 
   const handleChecklistToggle = (itemId, completed) => {
-    // Update local state only (no auto-save)
+    // Update local state only (no auto-save, no parent update)
     const updatedChecklist = checklist.map(item => 
       item.id === itemId 
         ? { 
@@ -115,11 +115,6 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     );
     
     setChecklist(updatedChecklist);
-    
-    // Update parent component immediately for percentage display
-    if (onUpdate) {
-      onUpdate({ ...workOrder, checklist: updatedChecklist });
-    }
   };
 
   const addChecklistItem = () => {
