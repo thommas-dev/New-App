@@ -333,6 +333,16 @@ function DailyTasks({ user }) {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="space-y-6" data-testid="daily-tasks">
+        <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm text-center">
+          <p>Loading today's tasks...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6" data-testid="daily-tasks">
       {/* Header */}
