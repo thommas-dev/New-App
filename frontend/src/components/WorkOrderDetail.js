@@ -177,15 +177,37 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   };
 
   const saveChecklistChanges = async () => {
+    // Prevent multiple simultaneous saves
+    if (isChecklistSaving) return;
+    
+    setIsChecklistSaving(true);
+    
     try {
-      // Save to backend
-      await axios.put(`${API}/work-orders/${workOrder.id}`, {
+      // Cancel any previous save request
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+      
+      // Create new AbortController for this request
+      abortRef.current = new AbortController();
+      
+      // Save to backend with abort signal
+      const response = await axios.put(`${API}/work-orders/${workOrder.id}`, {
         checklist: checklist
+      }, {
+        signal: abortRef.current.signal
       });
       
-      // Trigger cross-page synchronization
+      // Use authoritative data from backend response
+      const savedChecklist = response.data.checklist || checklist;
+      setChecklist(savedChecklist);
+      
+      // Clear localStorage draft after successful save
+      localStorage.removeItem(cacheKey);
+      
+      // Trigger cross-page synchronization with authoritative data
       const updateEvent = new CustomEvent('workOrderUpdated', {
-        detail: { workOrderId: workOrder.id, checklist: checklist }
+        detail: { workOrderId: workOrder.id, checklist: savedChecklist }
       });
       window.dispatchEvent(updateEvent);
       
@@ -194,8 +216,16 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       // Don't call onUpdate to prevent modal from closing
       // Parent component will refresh data when modal is actually closed
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Save request was aborted');
+        return; // Don't show error for aborted requests
+      }
+      
       console.error('Failed to save checklist:', error);
       toast.error('Failed to save checklist');
+    } finally {
+      setIsChecklistSaving(false);
+      abortRef.current = null;
     }
   };
 
