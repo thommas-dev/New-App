@@ -155,15 +155,6 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     }
   };
 
-  const handleWorkOrderUpdate = (updatedWorkOrder) => {
-    setWorkOrders(prevOrders =>
-      prevOrders.map(wo =>
-        wo.id === updatedWorkOrder.id ? updatedWorkOrder : wo
-      )
-    );
-    setSelectedWorkOrder(null);
-  };
-
   const handlePrint = () => {
     const printWindow = window.open('', '_blank');
     const printContent = generateWorkOrderPrintContent();
