@@ -28,7 +28,8 @@ import {
   Trash2
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   const [editMode, setEditMode] = useState(false);
