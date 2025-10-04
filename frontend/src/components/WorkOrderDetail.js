@@ -153,15 +153,18 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
     if (!newChecklistItem.trim()) return;
     
     const newItem = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // More unique ID
       text: newChecklistItem.trim(),
       completed: false,
       created_at: new Date().toISOString(),
       created_by: user.username
     };
     
-    setChecklist(prev => [...prev, newItem]);
+    const updatedChecklist = [...checklist, newItem];
+    setChecklist(updatedChecklist);
     setNewChecklistItem('');
+    // Save draft to localStorage
+    localStorage.setItem(cacheKey, JSON.stringify(updatedChecklist));
     toast.success('Checklist item added');
   };
 
