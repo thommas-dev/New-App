@@ -575,6 +575,9 @@ class BackendTester:
             await self.test_subscription_status_endpoint()
             await self.test_protected_routes_access()
             
+            # MAIN FOCUS: Work Order Checklist Update Tests
+            await self.test_work_order_checklist_update()
+            
             # Payment Integration Tests
             await self.test_payment_packages_endpoint()
             await self.test_create_checkout_session()
