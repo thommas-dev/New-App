@@ -172,12 +172,14 @@ function DailyTasks({ user }) {
   };
 
   const handleTaskUpdate = (updatedTask) => {
-    // Update the task in the state
-    setTodaysTasks(prevTasks =>
-      prevTasks.map(task =>
-        task.id === updatedTask.id ? updatedTask : task
-      )
-    );
+    // Update work orders list if it's a work order
+    if (updatedTask.wo_id || updatedTask.type === 'repair') {
+      setWorkOrders(prevOrders =>
+        prevOrders.map(wo =>
+          wo.id === updatedTask.id ? updatedTask : wo
+        )
+      );
+    }
     setSelectedTask(null);
   };
 
