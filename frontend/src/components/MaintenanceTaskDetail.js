@@ -45,6 +45,35 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
   const [checklist, setChecklist] = useState(task.checklist || []);
   const [files, setFiles] = useState(task.files || []);
   const [newChecklistItem, setNewChecklistItem] = useState('');
+  const [isChecklistSaving, setIsChecklistSaving] = useState(false);
+  const abortRef = useRef(null);
+  
+  // Generate unique cache key for this maintenance task
+  const cacheKey = `equiptrack:checklist:maintenance:${task.id || 'sample'}`;
+  
+  // Load checklist from localStorage on mount (check for unsaved changes)
+  useEffect(() => {
+    const savedDraft = localStorage.getItem(cacheKey);
+    if (savedDraft) {
+      try {
+        const draftChecklist = JSON.parse(savedDraft);
+        // Only use draft if it's newer than current checklist
+        if (draftChecklist.length !== checklist.length || 
+            JSON.stringify(draftChecklist) !== JSON.stringify(checklist)) {
+          setChecklist(draftChecklist);
+        }
+      } catch (error) {
+        console.error('Failed to parse checklist draft:', error);
+      }
+    }
+  }, []);
+  
+  useEffect(() => {
+    return () => {
+      // Cancel any in-flight save on unmount
+      abortRef.current?.abort();
+    };
+  }, []);
 
   const handleSave = async () => {
     setLoading(true);
