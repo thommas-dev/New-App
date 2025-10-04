@@ -64,6 +64,25 @@ function KanbanBoard({ user }) {
   useEffect(() => {
     fetchWorkOrders();
     fetchDepartments();
+
+    // Listen for work order updates from other pages
+    const handleWorkOrderUpdate = (event) => {
+      const { workOrderId, checklist } = event.detail;
+      setWorkOrders(prevOrders =>
+        prevOrders.map(wo =>
+          wo.id === workOrderId
+            ? { ...wo, checklist: checklist }
+            : wo
+        )
+      );
+    };
+
+    window.addEventListener('workOrderUpdated', handleWorkOrderUpdate);
+    
+    // Cleanup listener
+    return () => {
+      window.removeEventListener('workOrderUpdated', handleWorkOrderUpdate);
+    };
   }, []);
 
   const handleDragStart = (e, workOrder) => {
