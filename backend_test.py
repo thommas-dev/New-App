@@ -562,33 +562,341 @@ class BackendTester:
         self.log_result("Expired Trial Test Setup", True, 
                       "User ready for expired trial testing (DB manipulation needed for full test)")
         
+    async def test_critical_data_loading_failures(self):
+        """URGENT: Test critical data loading failures reported by user"""
+        print("\n=== URGENT: Testing Critical Data Loading Failures ===")
+        
+        if not self.auth_token:
+            self.log_result("Critical Data Loading", False, "No auth token available")
+            return
+            
+        # Test 1: GET /api/machines - "Failed to load machines"
+        print("\n--- Test 1: GET /api/machines ---")
+        success, response, status = await self.make_request(
+            "GET", "/machines", expect_status=200
+        )
+        
+        if success:
+            if isinstance(response, list):
+                self.log_result("Machines Loading", True, 
+                              f"Successfully loaded {len(response)} machines")
+            else:
+                self.log_result("Machines Loading", False, 
+                              "Response is not a list", response)
+        else:
+            self.log_result("Machines Loading", False, 
+                          f"Failed to load machines - Status: {status}, Response: {response}")
+            
+        # Test 2: GET /api/work-orders - "Failed to load work orders"
+        print("\n--- Test 2: GET /api/work-orders ---")
+        success, response, status = await self.make_request(
+            "GET", "/work-orders", expect_status=200
+        )
+        
+        if success:
+            if isinstance(response, list):
+                self.log_result("Work Orders Loading", True, 
+                              f"Successfully loaded {len(response)} work orders")
+                self.test_work_orders = response  # Store for checklist persistence test
+            else:
+                self.log_result("Work Orders Loading", False, 
+                              "Response is not a list", response)
+        else:
+            self.log_result("Work Orders Loading", False, 
+                          f"Failed to load work orders - Status: {status}, Response: {response}")
+            
+        # Test 3: GET /api/departments - Check departments loading
+        print("\n--- Test 3: GET /api/departments ---")
+        success, response, status = await self.make_request(
+            "GET", "/departments", expect_status=200
+        )
+        
+        if success:
+            if isinstance(response, list):
+                self.log_result("Departments Loading", True, 
+                              f"Successfully loaded {len(response)} departments")
+            else:
+                self.log_result("Departments Loading", False, 
+                              "Response is not a list", response)
+        else:
+            self.log_result("Departments Loading", False, 
+                          f"Failed to load departments - Status: {status}, Response: {response}")
+            
+    async def test_authentication_and_access_detailed(self):
+        """Test authentication tokens and trial system blocking data access"""
+        print("\n=== Testing Authentication & Access Control ===")
+        
+        # Test 1: Check if authentication tokens are working
+        print("\n--- Test 1: Authentication Token Validation ---")
+        success, response, status = await self.make_request(
+            "GET", "/auth/me", expect_status=200
+        )
+        
+        if success:
+            user_data = response
+            if user_data.get("id") and user_data.get("username"):
+                self.log_result("Authentication Token", True, 
+                              f"Token valid for user: {user_data.get('username')}")
+            else:
+                self.log_result("Authentication Token", False, 
+                              "Invalid user data in token response", user_data)
+        else:
+            self.log_result("Authentication Token", False, 
+                          f"Token validation failed - Status: {status}, Response: {response}")
+            
+        # Test 2: Check trial system status
+        print("\n--- Test 2: Trial System Status ---")
+        success, response, status = await self.make_request(
+            "GET", "/subscription/status", expect_status=200
+        )
+        
+        if success:
+            is_trial = response.get("is_trial")
+            trial_days = response.get("trial_days_remaining")
+            has_subscription = response.get("has_active_subscription")
+            
+            if has_subscription:
+                self.log_result("Trial System Access", True, 
+                              f"User has access - Trial: {is_trial}, Days: {trial_days}")
+            else:
+                self.log_result("Trial System Access", False, 
+                              f"User access denied - Trial expired or no subscription", response)
+        else:
+            self.log_result("Trial System Status", False, 
+                          f"Failed to check trial status - Status: {status}, Response: {response}")
+            
+        # Test 3: Test access without authentication
+        print("\n--- Test 3: Access Without Authentication ---")
+        old_token = self.auth_token
+        self.auth_token = None
+        
+        success, response, status = await self.make_request(
+            "GET", "/work-orders", expect_status=401
+        )
+        
+        if status == 401:
+            self.log_result("Unauthenticated Access Block", True, 
+                          "Properly blocks access without authentication")
+        else:
+            self.log_result("Unauthenticated Access Block", False, 
+                          f"Should block access, got status {status}: {response}")
+            
+        self.auth_token = old_token  # Restore token
+        
+    async def test_checklist_persistence_comprehensive(self):
+        """Comprehensive test of checklist persistence issues"""
+        print("\n=== Testing Checklist Persistence Issues ===")
+        
+        if not self.auth_token:
+            self.log_result("Checklist Persistence", False, "No auth token available")
+            return
+            
+        # Step 1: Create a work order with initial checklist
+        print("\n--- Step 1: Create work order with checklist ---")
+        work_order_data = {
+            "title": "Checklist Persistence Test",
+            "type": "PM",
+            "priority": "High",
+            "description": "Testing checklist data persistence",
+            "checklist_items": ["Initial task 1", "Initial task 2", "Initial task 3"]
+        }
+        
+        success, response, status = await self.make_request(
+            "POST", "/work-orders", work_order_data, expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Work Order Creation", False, 
+                          f"Failed to create work order: {response}", status)
+            return
+            
+        work_order_id = response.get("id")
+        initial_checklist = response.get("checklist", [])
+        
+        self.log_result("Work Order Creation", True, 
+                      f"Created work order with {len(initial_checklist)} checklist items")
+        
+        # Step 2: Update checklist with completed items
+        print("\n--- Step 2: Update checklist with completed items ---")
+        updated_checklist = []
+        for i, item in enumerate(initial_checklist):
+            updated_item = {
+                "id": item.get("id"),
+                "text": item.get("text"),
+                "completed": i % 2 == 0,  # Mark every other item as completed
+            }
+            if updated_item["completed"]:
+                updated_item["completed_by"] = self.user_id
+                updated_item["completed_at"] = datetime.now(timezone.utc).isoformat()
+            updated_checklist.append(updated_item)
+            
+        # Add a new item
+        updated_checklist.append({
+            "id": "new_item_1",
+            "text": "New task added during update",
+            "completed": True,
+            "completed_by": self.user_id,
+            "completed_at": datetime.now(timezone.utc).isoformat()
+        })
+        
+        update_data = {"checklist": updated_checklist}
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", update_data, expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            completed_count = sum(1 for item in returned_checklist if item.get("completed"))
+            
+            self.log_result("Checklist Update", True, 
+                          f"Updated checklist - {len(returned_checklist)} items, {completed_count} completed")
+        else:
+            self.log_result("Checklist Update", False, 
+                          f"Failed to update checklist: {response}", status)
+            return
+            
+        # Step 3: Retrieve work order and verify persistence
+        print("\n--- Step 3: Verify checklist persistence ---")
+        success, response, status = await self.make_request(
+            "GET", f"/work-orders/{work_order_id}", expect_status=200
+        )
+        
+        if success:
+            retrieved_checklist = response.get("checklist", [])
+            retrieved_completed = sum(1 for item in retrieved_checklist if item.get("completed"))
+            
+            # Verify data integrity
+            if len(retrieved_checklist) == len(updated_checklist):
+                self.log_result("Checklist Persistence - Count", True, 
+                              f"Checklist count persisted correctly: {len(retrieved_checklist)} items")
+            else:
+                self.log_result("Checklist Persistence - Count", False, 
+                              f"Count mismatch - Expected: {len(updated_checklist)}, Got: {len(retrieved_checklist)}")
+                
+            if retrieved_completed == completed_count:
+                self.log_result("Checklist Persistence - Completion", True, 
+                              f"Completion status persisted correctly: {retrieved_completed} completed")
+            else:
+                self.log_result("Checklist Persistence - Completion", False, 
+                              f"Completion mismatch - Expected: {completed_count}, Got: {retrieved_completed}")
+                
+            # Check specific completed item data
+            completed_items = [item for item in retrieved_checklist if item.get("completed")]
+            valid_completed = all(
+                item.get("completed_by") and item.get("completed_at") 
+                for item in completed_items
+            )
+            
+            if valid_completed:
+                self.log_result("Checklist Persistence - Metadata", True, 
+                              "Completed items have proper completed_by and completed_at data")
+            else:
+                self.log_result("Checklist Persistence - Metadata", False, 
+                              "Some completed items missing metadata", completed_items)
+        else:
+            self.log_result("Checklist Persistence Verification", False, 
+                          f"Failed to retrieve work order: {response}", status)
+            
+        # Step 4: Test multiple update cycles
+        print("\n--- Step 4: Test multiple update cycles ---")
+        for cycle in range(3):
+            print(f"Update cycle {cycle + 1}")
+            
+            # Modify checklist
+            cycle_checklist = []
+            for item in retrieved_checklist:
+                modified_item = item.copy()
+                modified_item["text"] = f"{item.get('text')} - Cycle {cycle + 1}"
+                cycle_checklist.append(modified_item)
+                
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", {"checklist": cycle_checklist}, expect_status=200
+            )
+            
+            if success:
+                retrieved_checklist = response.get("checklist", [])
+            else:
+                self.log_result(f"Multiple Updates - Cycle {cycle + 1}", False, 
+                              f"Update failed: {response}", status)
+                break
+        else:
+            self.log_result("Multiple Update Cycles", True, 
+                          "Successfully completed 3 update cycles")
+            
+    async def test_data_consistency_and_progress(self):
+        """Test data consistency and progress indicators"""
+        print("\n=== Testing Data Consistency & Progress Indicators ===")
+        
+        if not self.auth_token:
+            self.log_result("Data Consistency", False, "No auth token available")
+            return
+            
+        # Get all work orders and analyze consistency
+        success, response, status = await self.make_request(
+            "GET", "/work-orders", expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Data Consistency Check", False, 
+                          f"Failed to load work orders: {response}", status)
+            return
+            
+        work_orders = response
+        
+        # Check each work order for data consistency
+        consistent_count = 0
+        total_count = len(work_orders)
+        
+        for wo in work_orders:
+            checklist = wo.get("checklist", [])
+            total_items = len(checklist)
+            completed_items = sum(1 for item in checklist if item.get("completed"))
+            
+            # Calculate progress percentage
+            if total_items > 0:
+                progress_percentage = (completed_items / total_items) * 100
+            else:
+                progress_percentage = 0
+                
+            # Check if progress calculation is consistent
+            if total_items == 0 or (0 <= progress_percentage <= 100):
+                consistent_count += 1
+            else:
+                self.log_result(f"Progress Calculation - WO {wo.get('wo_id')}", False, 
+                              f"Invalid progress: {progress_percentage}% ({completed_items}/{total_items})")
+                
+        if consistent_count == total_count:
+            self.log_result("Progress Indicators Consistency", True, 
+                          f"All {total_count} work orders have consistent progress calculations")
+        else:
+            self.log_result("Progress Indicators Consistency", False, 
+                          f"Only {consistent_count}/{total_count} work orders have consistent progress")
+
     async def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 Starting EquipTrack Backend Testing Suite")
+        """Run all backend tests focusing on critical data loading failures"""
+        print("🚀 URGENT: EquipTrack Critical Data Loading Diagnostic")
         print(f"Testing against: {BASE_URL}")
+        print("Focus: Critical data loading failures reported by user")
         
         await self.setup()
         
         try:
             # Authentication & Trial System Tests
             await self.test_user_registration_with_trial()
-            await self.test_subscription_status_endpoint()
-            await self.test_protected_routes_access()
+            await self.test_authentication_and_access_detailed()
             
-            # MAIN FOCUS: Work Order Checklist Update Tests
+            # CRITICAL: Data Loading Tests
+            await self.test_critical_data_loading_failures()
+            
+            # CRITICAL: Checklist Persistence Tests
+            await self.test_checklist_persistence_comprehensive()
+            
+            # Data Consistency Tests
+            await self.test_data_consistency_and_progress()
+            
+            # Original comprehensive checklist test
             await self.test_work_order_checklist_update()
-            
-            # Payment Integration Tests
-            await self.test_payment_packages_endpoint()
-            await self.test_create_checkout_session()
-            await self.test_payment_status_endpoint()
-            await self.test_stripe_webhook_endpoint()
-            
-            # Database Tests
-            await self.test_database_payment_transactions()
-            
-            # Access Control Tests
-            await self.simulate_expired_trial_user()
             
         finally:
             await self.cleanup()
