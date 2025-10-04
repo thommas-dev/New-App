@@ -183,7 +183,7 @@ function KanbanBoard({ user }) {
       <div className="bg-white rounded-lg border border-gray-200 p-6 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Work Orders Board</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">Repair Work Orders</h2>
             <p className="text-gray-600 mt-1">
               {filteredWorkOrders.length} work orders
             </p>
