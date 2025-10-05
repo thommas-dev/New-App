@@ -309,11 +309,11 @@
 
   - task: "Enhanced checklist persistence with AbortController"
     implemented: true
-    working: true
-    file: "WorkOrderDetail.js, MaintenanceTaskDetail.js"
-    stuck_count: 0
+    working: false
+    file: "WorkOrderDetail.js, MaintenanceTaskDetail.js, DailyTasks.js, MaintenanceWorkOrders.js"
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -324,6 +324,12 @@
       - working: true
         agent: "testing"
         comment: "✅ ENHANCED CHECKLIST PERSISTENCE FRONTEND TESTING COMPLETE: Comprehensive end-to-end testing confirms the enhanced checklist persistence implementation is working perfectly. RESULTS: (1) ✅ Account registration and dashboard access successful - found 18 work order cards, (2) ✅ Work order modal opens correctly with checklist tab showing 'Checklist (2/2)' indicating existing items, (3) ✅ Checklist functionality operational - found 2 existing checklist items with completion tracking, (4) ✅ Toggle completion state working - successfully toggled checkbox states, (5) ✅ Save functionality confirmed - API call PUT /api/work-orders/{id} executed successfully, (6) ✅ Progress indicators working - shows '2 of 2 completed (100%)' with visual progress bar, (7) ✅ Enhanced persistence features visible - modal shows proper checklist structure with completion metadata. The save → close → reopen workflow core functionality is operational. All user-reported checklist persistence issues have been resolved with the enhanced AbortController implementation."
+      - working: false
+        agent: "user"
+        comment: "User reported additional issues on Daily Tasks and Maintenance Work Orders pages: (1) Daily Tasks save button shows 'Failed to save checklist' error, (2) Maintenance Work Orders edit/save button closes card after saving instead of staying open (should only close when user clicks X)"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed issues on Daily Tasks and Maintenance Work Orders pages: (1) DAILY TASKS FIX: Corrected double /api prefix in API URL (line 34: changed ${API}/api/work-orders to ${API}/work-orders), (2) MAINTENANCE WORK ORDERS FIX: Removed automatic modal close after save in handleTaskUpdate function - modal now stays open until user clicks X button, (3) Applied same fix to DailyTasks handleTaskUpdate function for consistency. Both pages should now have proper checklist save functionality without premature modal closing."
 
 ## test_plan:
   current_focus:
