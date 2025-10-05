@@ -149,9 +149,8 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
       toast.success('Work order and checklist updated successfully!');
       setEditMode(false);
       
-      if (onUpdate) {
-        onUpdate(savedData);
-      }
+      // Don't call onUpdate here to prevent modal from closing
+      // Modal should only close when user clicks X button
     } catch (error) {
       if (error.name === 'AbortError') {
         console.log('Save request was aborted');
