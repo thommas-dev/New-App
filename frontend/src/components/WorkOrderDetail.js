@@ -851,6 +851,7 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                         checked={item.completed}
                         onCheckedChange={(checked) => handleChecklistToggle(item.id, checked)}
                         className="mt-0.5"
+                        disabled={!editMode}
                         data-testid={`checklist-item-${index}`}
                       />
                       <div className="flex-1">
