@@ -787,14 +787,16 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
                           )}
                         </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeChecklistItem(item.id)}
-                        className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
+                      {editMode && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeChecklistItem(item.id)}
+                          className="h-6 w-6 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </Button>
+                      )}
                     </div>
                   ))}
                 </div>
