@@ -1774,10 +1774,10 @@ class BackendTester:
                           f"One or both uniform updates failed - Status1: {status1}, Status2: {status2}")
 
     async def run_all_tests(self):
-        """Run all backend tests focusing on enhanced checklist persistence"""
-        print("🚀 ENHANCED CHECKLIST PERSISTENCE TESTING")
+        """Run all backend tests focusing on Daily Tasks and Maintenance Work Orders API fixes"""
+        print("🚀 DAILY TASKS & MAINTENANCE WORK ORDERS API FIXES TESTING")
         print(f"Testing against: {BASE_URL}")
-        print("Focus: Enhanced checklist persistence with AbortController support")
+        print("Focus: Testing fixed API calls for Daily Tasks and Maintenance Work Orders pages")
         
         await self.setup()
         
@@ -1785,10 +1785,11 @@ class BackendTester:
             # Authentication setup
             await self.test_user_registration_with_trial()
             
-            # MAIN FOCUS: Enhanced Checklist Persistence with AbortController
-            await self.test_enhanced_checklist_persistence_with_abortcontroller()
+            # MAIN FOCUS: Daily Tasks and Maintenance Work Orders API Fixes
+            await self.test_daily_tasks_and_maintenance_work_orders_api_fixes()
             
             # Additional focused tests
+            await self.test_enhanced_checklist_persistence_with_abortcontroller()
             await self.test_checklist_save_reopen_cycle()
             await self.test_work_order_checklist_update()
             
