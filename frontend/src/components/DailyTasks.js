@@ -208,6 +208,30 @@ function DailyTasks({ user }) {
         )
       );
     }
+    
+    // Update maintenance tasks if it's a maintenance task
+    if (updatedTask.type === 'maintenance') {
+      const frequency = updatedTask.frequency?.toLowerCase() || 'daily';
+      setMaintenanceTasks(prev => {
+        const updated = {
+          ...prev,
+          [frequency]: prev[frequency].map(task => 
+            task.id === updatedTask.id ? updatedTask : task
+          )
+        };
+        
+        // Save to localStorage and notify other pages
+        try {
+          localStorage.setItem('equiptrack:maintenanceTasks', JSON.stringify(updated));
+          window.dispatchEvent(new CustomEvent('maintenanceTasksUpdated', { detail: updated }));
+        } catch (error) {
+          console.error('Failed to save maintenance task update:', error);
+        }
+        
+        return updated;
+      });
+    }
+    
     // Don't close modal after save - let user close manually with X button
     // setSelectedTask(null);
   };
