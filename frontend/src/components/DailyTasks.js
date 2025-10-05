@@ -176,13 +176,8 @@ function DailyTasks({ user }) {
   const handleChecklistToggle = (taskId, itemId, completed, event) => {
     event.stopPropagation(); // Prevent opening the task detail
     
-    // For work orders, open the modal instead of updating locally
-    // For maintenance tasks, just show a message since they're sample data
-    if (typeof taskId === 'string' && taskId.startsWith('maintenance-')) {
-      toast.info('Open the maintenance task to update checklist items');
-    } else {
-      toast.info('Click the task card to open and modify the checklist');
-    }
+    // Direct users to open the task card to modify checklists
+    toast.info('Click the task card to open and modify the checklist');
   };
 
   const TaskCard = ({ task, showNotification = false }) => {
