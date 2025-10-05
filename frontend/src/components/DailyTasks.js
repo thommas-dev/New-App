@@ -107,11 +107,15 @@ function DailyTasks({ user }) {
     };
   }, [API]);
 
-  // Filter work orders for today's tasks (only real work orders, no sample data)
-  const todaysTasks = workOrders.filter(wo => {
-    // Show work orders that are not completed
-    return wo.status !== 'Completed';
-  });
+  // Combine work orders and maintenance tasks for today's view
+  const todaysTasks = [
+    // Real work orders that are not completed
+    ...workOrders.filter(wo => wo.status !== 'Completed'),
+    // Add maintenance tasks (marked with type: 'maintenance')
+    ...maintenanceTasks.daily.map(task => ({ ...task, type: 'maintenance', frequency: 'Daily' })),
+    ...maintenanceTasks.weekly.map(task => ({ ...task, type: 'maintenance', frequency: 'Weekly' })),
+    ...maintenanceTasks.monthly.map(task => ({ ...task, type: 'maintenance', frequency: 'Monthly' }))
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
