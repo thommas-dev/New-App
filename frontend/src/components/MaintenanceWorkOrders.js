@@ -21,10 +21,26 @@ function MaintenanceWorkOrders({ user }) {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [maintenanceTasks, setMaintenanceTasks] = useState(null);
   const [workOrders, setWorkOrders] = useState([]);
-  const [sampleMaintenanceTasks, setSampleMaintenanceTasks] = useState({
-    daily: [],
-    weekly: [],
-    monthly: []
+  // Initialize maintenance tasks from localStorage or empty arrays
+  const [sampleMaintenanceTasks, setSampleMaintenanceTasks] = useState(() => {
+    try {
+      const saved = localStorage.getItem('equiptrack:maintenanceTasks');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return {
+          daily: parsed.daily || [],
+          weekly: parsed.weekly || [],
+          monthly: parsed.monthly || []
+        };
+      }
+    } catch (error) {
+      console.error('Failed to load maintenance tasks from localStorage:', error);
+    }
+    return {
+      daily: [],
+      weekly: [],
+      monthly: []
+    };
   });
 
   const API = process.env.REACT_APP_BACKEND_URL;
