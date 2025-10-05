@@ -172,7 +172,7 @@ function MaintenanceWorkOrders({ user }) {
   React.useEffect(() => {
     const fetchWorkOrders = async () => {
       try {
-        const response = await fetch(`${API}/api/work-orders`, {
+        const response = await fetch(`${API}/work-orders`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
