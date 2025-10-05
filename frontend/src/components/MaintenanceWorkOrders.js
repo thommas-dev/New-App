@@ -49,6 +49,12 @@ function MaintenanceWorkOrders({ user }) {
   useEffect(() => {
     try {
       localStorage.setItem('equiptrack:maintenanceTasks', JSON.stringify(sampleMaintenanceTasks));
+      
+      // Dispatch event for cross-page synchronization
+      const updateEvent = new CustomEvent('maintenanceTasksUpdated', {
+        detail: sampleMaintenanceTasks
+      });
+      window.dispatchEvent(updateEvent);
     } catch (error) {
       console.error('Failed to save maintenance tasks to localStorage:', error);
     }
