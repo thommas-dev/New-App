@@ -210,7 +210,8 @@ function DailyTasks({ user }) {
         )
       );
     }
-    setSelectedTask(null);
+    // Don't close modal after save - let user close manually with X button
+    // setSelectedTask(null);
   };
 
   const handleChecklistToggle = (taskId, itemId, completed, event) => {
