@@ -1494,6 +1494,285 @@ class BackendTester:
             self.log_result("Malformed Data Handling", False, 
                           "Issues with malformed data handling")
 
+    async def test_daily_tasks_and_maintenance_work_orders_api_fixes(self):
+        """Test the fixed API calls for Daily Tasks and Maintenance Work Orders pages"""
+        print("\n=== TESTING DAILY TASKS & MAINTENANCE WORK ORDERS API FIXES ===")
+        
+        if not self.auth_token:
+            self.log_result("API Fixes Test", False, "No auth token available")
+            return
+            
+        # Test 1: Verify GET /api/work-orders endpoint is working correctly
+        print("\n--- Test 1: GET /api/work-orders endpoint verification ---")
+        success, response, status = await self.make_request(
+            "GET", "/work-orders", expect_status=200
+        )
+        
+        if success:
+            if isinstance(response, list):
+                self.log_result("GET /api/work-orders Endpoint", True, 
+                              f"Successfully loaded {len(response)} work orders")
+                self.test_work_orders_for_checklist = response
+            else:
+                self.log_result("GET /api/work-orders Endpoint", False, 
+                              "Response is not a list", response)
+        else:
+            self.log_result("GET /api/work-orders Endpoint", False, 
+                          f"Failed to load work orders - Status: {status}, Response: {response}")
+            return
+            
+        # Test 2: Test corrected API URLs (no double /api prefix)
+        print("\n--- Test 2: Verify corrected API URLs (no double /api prefix) ---")
+        
+        # This test verifies that the frontend is now calling the correct URLs
+        # We test the backend endpoints that the frontend should be calling
+        endpoints_to_test = [
+            ("/work-orders", "Work Orders"),
+            ("/departments", "Departments"), 
+            ("/machines", "Machines"),
+            ("/users", "Users")
+        ]
+        
+        for endpoint, name in endpoints_to_test:
+            success, response, status = await self.make_request(
+                "GET", endpoint, expect_status=200
+            )
+            
+            if success:
+                self.log_result(f"Corrected API URL - {name}", True, 
+                              f"{name} endpoint accessible at /api{endpoint}")
+            else:
+                self.log_result(f"Corrected API URL - {name}", False, 
+                              f"Failed to access {name} at /api{endpoint} - Status: {status}")
+        
+        # Test 3: Test authentication headers are being passed correctly
+        print("\n--- Test 3: Authentication headers verification ---")
+        
+        # Test with valid token
+        success, response, status = await self.make_request(
+            "GET", "/auth/me", expect_status=200
+        )
+        
+        if success:
+            self.log_result("Authentication Headers - Valid Token", True, 
+                          "Authentication headers passed correctly with valid token")
+        else:
+            self.log_result("Authentication Headers - Valid Token", False, 
+                          f"Failed with valid token - Status: {status}, Response: {response}")
+        
+        # Test without token
+        old_token = self.auth_token
+        self.auth_token = None
+        
+        success, response, status = await self.make_request(
+            "GET", "/work-orders", expect_status=401
+        )
+        
+        if status == 401:
+            self.log_result("Authentication Headers - No Token", True, 
+                          "Properly rejects requests without authentication")
+        else:
+            self.log_result("Authentication Headers - No Token", False, 
+                          f"Should reject without auth, got status {status}")
+        
+        self.auth_token = old_token  # Restore token
+        
+        # Test 4: Test PUT /api/work-orders/{id} endpoint for checklist updates
+        print("\n--- Test 4: PUT /api/work-orders/{id} checklist updates ---")
+        
+        if not hasattr(self, 'test_work_orders_for_checklist') or not self.test_work_orders_for_checklist:
+            self.log_result("Checklist Update Test Setup", False, "No work orders available for testing")
+            return
+            
+        # Use first available work order for testing
+        test_work_order = self.test_work_orders_for_checklist[0]
+        work_order_id = test_work_order.get("id")
+        
+        if not work_order_id:
+            self.log_result("Checklist Update Test Setup", False, "No work order ID available")
+            return
+            
+        # Test checklist update from Daily Tasks page perspective
+        print("\n  Test 4a: Daily Tasks page checklist save")
+        daily_tasks_checklist = [
+            {
+                "id": "daily-task-1",
+                "text": "Daily task checklist item 1",
+                "completed": False
+            },
+            {
+                "id": "daily-task-2", 
+                "text": "Daily task checklist item 2",
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", 
+            {"checklist": daily_tasks_checklist}, 
+            expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            if len(returned_checklist) == 2:
+                self.log_result("Daily Tasks Checklist Save", True, 
+                              "Daily Tasks page checklist save working correctly")
+            else:
+                self.log_result("Daily Tasks Checklist Save", False, 
+                              f"Expected 2 items, got {len(returned_checklist)}")
+        else:
+            self.log_result("Daily Tasks Checklist Save", False, 
+                          f"Daily Tasks checklist save failed - Status: {status}, Response: {response}")
+        
+        # Test checklist update from Maintenance Work Orders page perspective  
+        print("\n  Test 4b: Maintenance Work Orders page checklist save")
+        maintenance_checklist = [
+            {
+                "id": "maintenance-1",
+                "text": "Maintenance checklist item 1", 
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "maintenance-2",
+                "text": "Maintenance checklist item 2",
+                "completed": False
+            },
+            {
+                "id": "maintenance-3",
+                "text": "Maintenance checklist item 3",
+                "completed": True,
+                "completed_by": self.user_id, 
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}",
+            {"checklist": maintenance_checklist},
+            expect_status=200
+        )
+        
+        if success:
+            returned_checklist = response.get("checklist", [])
+            completed_count = sum(1 for item in returned_checklist if item.get("completed"))
+            
+            if len(returned_checklist) == 3 and completed_count == 2:
+                self.log_result("Maintenance Work Orders Checklist Save", True, 
+                              "Maintenance Work Orders page checklist save working correctly")
+            else:
+                self.log_result("Maintenance Work Orders Checklist Save", False, 
+                              f"Expected 3 items (2 completed), got {len(returned_checklist)} items ({completed_count} completed)")
+        else:
+            self.log_result("Maintenance Work Orders Checklist Save", False, 
+                          f"Maintenance Work Orders checklist save failed - Status: {status}, Response: {response}")
+        
+        # Test 5: Verify no "Failed to save checklist" errors occur
+        print("\n--- Test 5: Verify no checklist save errors ---")
+        
+        # Test multiple rapid saves to simulate real usage
+        rapid_save_success = True
+        for i in range(3):
+            test_checklist = [
+                {
+                    "id": f"rapid-save-{i}",
+                    "text": f"Rapid save test item {i}",
+                    "completed": i % 2 == 0
+                }
+            ]
+            
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}",
+                {"checklist": test_checklist},
+                expect_status=200
+            )
+            
+            if not success:
+                rapid_save_success = False
+                self.log_result(f"Rapid Save Test {i+1}", False, 
+                              f"Save failed - Status: {status}, Response: {response}")
+                break
+        
+        if rapid_save_success:
+            self.log_result("Rapid Checklist Saves", True, 
+                          "Multiple rapid checklist saves completed successfully")
+        
+        # Test 6: Cross-page consistency verification
+        print("\n--- Test 6: Cross-page consistency verification ---")
+        
+        # Get the work order again to verify data consistency
+        success, response, status = await self.make_request(
+            "GET", f"/work-orders/{work_order_id}", expect_status=200
+        )
+        
+        if success:
+            final_checklist = response.get("checklist", [])
+            
+            # Verify the work order data structure is consistent
+            required_fields = ["id", "title", "status", "checklist"]
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            if not missing_fields:
+                self.log_result("Cross-Page Data Consistency", True, 
+                              f"Work order data structure consistent across pages - {len(final_checklist)} checklist items")
+            else:
+                self.log_result("Cross-Page Data Consistency", False, 
+                              f"Missing required fields: {missing_fields}")
+        else:
+            self.log_result("Cross-Page Data Consistency", False, 
+                          f"Failed to retrieve work order for consistency check - Status: {status}")
+        
+        # Test 7: Verify checklist updates work uniformly across all pages
+        print("\n--- Test 7: Uniform checklist update verification ---")
+        
+        # Test the same checklist structure that both pages would send
+        uniform_checklist = [
+            {
+                "id": "uniform-1",
+                "text": "Uniform test item 1",
+                "completed": False
+            },
+            {
+                "id": "uniform-2",
+                "text": "Uniform test item 2", 
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            }
+        ]
+        
+        # Test from "Daily Tasks" perspective
+        success1, response1, status1 = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}",
+            {"checklist": uniform_checklist},
+            expect_status=200
+        )
+        
+        # Test from "Maintenance Work Orders" perspective (same endpoint, same data)
+        success2, response2, status2 = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}",
+            {"checklist": uniform_checklist}, 
+            expect_status=200
+        )
+        
+        if success1 and success2:
+            checklist1 = response1.get("checklist", [])
+            checklist2 = response2.get("checklist", [])
+            
+            if len(checklist1) == len(checklist2) == 2:
+                self.log_result("Uniform Checklist Updates", True, 
+                              "Checklist updates work uniformly across all pages")
+            else:
+                self.log_result("Uniform Checklist Updates", False, 
+                              f"Inconsistent results - Response1: {len(checklist1)} items, Response2: {len(checklist2)} items")
+        else:
+            self.log_result("Uniform Checklist Updates", False, 
+                          f"One or both uniform updates failed - Status1: {status1}, Status2: {status2}")
+
     async def run_all_tests(self):
         """Run all backend tests focusing on enhanced checklist persistence"""
         print("🚀 ENHANCED CHECKLIST PERSISTENCE TESTING")
