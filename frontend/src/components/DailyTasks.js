@@ -28,6 +28,40 @@ function DailyTasks({ user }) {
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
   const API = `${BACKEND_URL}/api`;
 
+  // Load maintenance tasks from localStorage
+  useEffect(() => {
+    const loadMaintenanceTasks = () => {
+      try {
+        const saved = localStorage.getItem('equiptrack:maintenanceTasks');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setMaintenanceTasks({
+            daily: parsed.daily || [],
+            weekly: parsed.weekly || [],
+            monthly: parsed.monthly || []
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load maintenance tasks:', error);
+      }
+    };
+
+    loadMaintenanceTasks();
+
+    // Listen for maintenance task updates from other pages
+    const handleMaintenanceUpdate = () => {
+      loadMaintenanceTasks();
+    };
+
+    window.addEventListener('storage', handleMaintenanceUpdate);
+    window.addEventListener('maintenanceTasksUpdated', handleMaintenanceUpdate);
+
+    return () => {
+      window.removeEventListener('storage', handleMaintenanceUpdate);
+      window.removeEventListener('maintenanceTasksUpdated', handleMaintenanceUpdate);
+    };
+  }, []);
+
   // Fetch real work orders
   useEffect(() => {
     const fetchWorkOrders = async () => {
