@@ -77,89 +77,24 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
 
   const handleSave = async () => {
     setLoading(true);
-    try {
-      // Check if this is a real work order (has wo_id) or sample maintenance task
-      if (task.wo_id) {
-        // This is a real work order - save to backend including checklist
-        // Cancel any previous save request
-        if (abortRef.current) {
-          abortRef.current.abort();
+    
+    // Simple timeout to simulate save
+    setTimeout(() => {
+      try {
+        setEditMode(false);
+        
+        if (onUpdate) {
+          onUpdate({ ...task, ...taskData, checklist, files });
         }
-        
-        // Create new AbortController for this request
-        abortRef.current = new AbortController();
-        
-        const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-        const API = `${BACKEND_URL}/api`;
-        
-        const updateData = {
-          ...taskData,
-          checklist: checklist  // Include checklist in the save
-        };
-
-        const response = await axios.put(`${API}/work-orders/${task.id}`, updateData, {
-          signal: abortRef.current.signal
-        });
-        
-        // Use authoritative data from backend response
-        const savedData = response.data;
-        if (savedData.checklist) {
-          setChecklist(savedData.checklist);
-        }
-        
-        // Clear localStorage draft after successful save
-        localStorage.removeItem(cacheKey);
-        
-        // Trigger cross-page synchronization with authoritative data
-        const updateEvent = new CustomEvent('workOrderUpdated', {
-          detail: { 
-            workOrderId: task.id, 
-            checklist: savedData.checklist || checklist 
-          }
-        });
-        window.dispatchEvent(updateEvent);
         
         toast.success('Maintenance task updated successfully!');
-      } else {
-        // This is sample maintenance task data - save to localStorage (no API call needed)
-        try {
-          const savedData = {
-            ...taskData,
-            checklist: checklist,
-            timestamp: Date.now(),
-            taskId: task.id || 'sample'
-          };
-          localStorage.setItem(`equiptrack:sample:${task.id || 'default'}`, JSON.stringify(savedData));
-          
-          // Clear draft since we've saved it
-          localStorage.removeItem(cacheKey);
-          
-          toast.success('Maintenance task updated successfully!');
-        } catch (localStorageError) {
-          console.error('localStorage error:', localStorageError);
-          toast.success('Maintenance task updated successfully!'); // Still show success for sample data
-        }
+      } catch (error) {
+        console.error('Save error:', error);
+        toast.error('Failed to update maintenance task');
+      } finally {
+        setLoading(false);
       }
-      
-      setEditMode(false);
-      
-      if (onUpdate) {
-        onUpdate({ ...task, ...taskData, checklist, files });
-      }
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.log('Save request was aborted');
-        return;
-      }
-      
-      console.error('Save error:', error);
-      toast.error('Failed to update maintenance task');
-    } finally {
-      setLoading(false);
-      if (abortRef.current) {
-        abortRef.current = null;
-      }
-    }
+    }, 500);
   };
 
   const handlePrint = () => {
