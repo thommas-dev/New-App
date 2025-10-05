@@ -31,7 +31,7 @@ function MaintenanceWorkOrders({ user }) {
       icon: Clock,
       color: 'bg-blue-500',
       description: 'Daily inspection and maintenance tasks',
-      count: 5,
+      count: sampleMaintenanceTasks.daily?.length || 0,
       bgColor: 'from-blue-50 to-indigo-50',
       borderColor: 'border-blue-200'
     },
@@ -41,7 +41,7 @@ function MaintenanceWorkOrders({ user }) {
       icon: Calendar,
       color: 'bg-green-500',
       description: 'Weekly preventive maintenance schedules',
-      count: 12,
+      count: sampleMaintenanceTasks.weekly?.length || 0,
       bgColor: 'from-green-50 to-emerald-50',
       borderColor: 'border-green-200'
     },
@@ -51,7 +51,7 @@ function MaintenanceWorkOrders({ user }) {
       icon: Repeat,
       color: 'bg-purple-500',
       description: 'Monthly comprehensive maintenance',
-      count: 8,
+      count: sampleMaintenanceTasks.monthly?.length || 0,
       bgColor: 'from-purple-50 to-indigo-50',
       borderColor: 'border-purple-200'
     }
