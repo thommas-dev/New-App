@@ -334,6 +334,7 @@
 ## test_plan:
   current_focus:
     - "Enhanced checklist persistence with AbortController"
+    - "Daily Tasks and Maintenance Work Orders page fixes"
     - "Work order checklist update functionality"
     - "Pricing page component"
     - "Payment success page"
