@@ -546,10 +546,10 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
                     return;
                   }
                   
-                  // Check for unsaved changes
+                  // Check for unsaved changes (only if there's a draft AND we're in edit mode)
                   const currentDraft = localStorage.getItem(cacheKey);
-                  if (currentDraft && JSON.stringify(checklist) !== JSON.stringify(task.checklist)) {
-                    const proceed = window.confirm('You have unsaved checklist changes. Close anyway?');
+                  if (currentDraft && editMode) {
+                    const proceed = window.confirm('You have unsaved changes. Close anyway?');
                     if (!proceed) return;
                     
                     // Clear draft if user chooses to discard changes
