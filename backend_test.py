@@ -1773,6 +1773,413 @@ class BackendTester:
             self.log_result("Uniform Checklist Updates", False, 
                           f"One or both uniform updates failed - Status1: {status1}, Status2: {status2}")
 
+    async def test_integrated_save_functionality(self):
+        """Test the integrated save functionality for improved UX workflow"""
+        print("\n=== TESTING INTEGRATED SAVE FUNCTIONALITY (MAIN FOCUS) ===")
+        
+        if not self.auth_token:
+            self.log_result("Integrated Save Functionality", False, "No auth token available")
+            return
+            
+        # Test 1: Combined Work Order + Checklist Save
+        print("\n--- Test 1: Combined Work Order + Checklist Save ---")
+        
+        # Create a work order for testing
+        work_order_data = {
+            "title": "Integrated Save Test Work Order",
+            "type": "PM",
+            "priority": "High",
+            "description": "Testing integrated save functionality",
+            "checklist_items": ["Initial task 1", "Initial task 2"]
+        }
+        
+        success, response, status = await self.make_request(
+            "POST", "/work-orders", work_order_data, expect_status=200
+        )
+        
+        if not success:
+            self.log_result("Work Order Creation for Integrated Save", False, 
+                          f"Failed to create work order: {response}", status)
+            return
+            
+        work_order_id = response.get("id")
+        original_title = response.get("title")
+        original_checklist = response.get("checklist", [])
+        
+        self.log_result("Work Order Creation for Integrated Save", True, 
+                      f"Created work order {work_order_id} with {len(original_checklist)} checklist items")
+        
+        # Test combined update with both work order data AND checklist
+        combined_update_data = {
+            "title": "Updated Title via Integrated Save",
+            "description": "Updated description via integrated save",
+            "priority": "Critical",
+            "checklist": [
+                {
+                    "id": "integrated-item-1",
+                    "text": "New integrated task 1",
+                    "completed": False
+                },
+                {
+                    "id": "integrated-item-2",
+                    "text": "New integrated task 2", 
+                    "completed": True,
+                    "completed_by": self.user_id,
+                    "completed_at": datetime.now(timezone.utc).isoformat()
+                },
+                {
+                    "id": "integrated-item-3",
+                    "text": "New integrated task 3",
+                    "completed": False
+                }
+            ]
+        }
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", combined_update_data, expect_status=200
+        )
+        
+        if success:
+            # Verify both work order fields and checklist were updated
+            updated_title = response.get("title")
+            updated_description = response.get("description") 
+            updated_priority = response.get("priority")
+            updated_checklist = response.get("checklist", [])
+            
+            title_updated = updated_title == "Updated Title via Integrated Save"
+            description_updated = updated_description == "Updated description via integrated save"
+            priority_updated = updated_priority == "Critical"
+            checklist_updated = len(updated_checklist) == 3
+            
+            if title_updated and description_updated and priority_updated and checklist_updated:
+                self.log_result("Combined Work Order + Checklist Save", True, 
+                              "Successfully updated both work order data AND checklist in single request")
+            else:
+                self.log_result("Combined Work Order + Checklist Save", False, 
+                              f"Partial update - Title: {title_updated}, Desc: {description_updated}, Priority: {priority_updated}, Checklist: {checklist_updated}")
+        else:
+            self.log_result("Combined Work Order + Checklist Save", False, 
+                          f"Failed combined update: {response}", status)
+            return
+            
+        # Test 2: Verify backend handles combined update with checklist field
+        print("\n--- Test 2: Backend handling of combined updates ---")
+        
+        # Test with different combinations of fields
+        test_combinations = [
+            {
+                "name": "Title + Checklist",
+                "data": {
+                    "title": "Title Only Update",
+                    "checklist": [{"id": "combo-1", "text": "Combo task 1", "completed": False}]
+                }
+            },
+            {
+                "name": "Status + Checklist", 
+                "data": {
+                    "status": "In Progress",
+                    "checklist": [
+                        {"id": "combo-2", "text": "Combo task 2", "completed": True, 
+                         "completed_by": self.user_id, "completed_at": datetime.now(timezone.utc).isoformat()}
+                    ]
+                }
+            },
+            {
+                "name": "Multiple Fields + Checklist",
+                "data": {
+                    "title": "Multi-field Update",
+                    "priority": "Medium",
+                    "description": "Multi-field description",
+                    "checklist": [
+                        {"id": "combo-3", "text": "Multi combo task", "completed": False}
+                    ]
+                }
+            }
+        ]
+        
+        combination_success = True
+        for combo in test_combinations:
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", combo["data"], expect_status=200
+            )
+            
+            if success:
+                # Verify all requested fields were updated
+                all_fields_updated = True
+                for field, expected_value in combo["data"].items():
+                    if field == "checklist":
+                        actual_checklist = response.get("checklist", [])
+                        if len(actual_checklist) != len(expected_value):
+                            all_fields_updated = False
+                    else:
+                        if response.get(field) != expected_value:
+                            all_fields_updated = False
+                            
+                if not all_fields_updated:
+                    combination_success = False
+                    self.log_result(f"Backend Combination - {combo['name']}", False, 
+                                  "Not all fields updated correctly")
+            else:
+                combination_success = False
+                self.log_result(f"Backend Combination - {combo['name']}", False, 
+                              f"Update failed: {response}", status)
+                
+        if combination_success:
+            self.log_result("Backend Combined Update Handling", True, 
+                          "Backend correctly handles all combinations of work order + checklist updates")
+        
+        # Test 3: API Response includes complete work order object with checklist
+        print("\n--- Test 3: Complete API response verification ---")
+        
+        # Make an update and verify the response contains everything needed
+        complete_update = {
+            "title": "Complete Response Test",
+            "description": "Testing complete response",
+            "priority": "Low",
+            "status": "Scheduled",
+            "checklist": [
+                {
+                    "id": "complete-1",
+                    "text": "Complete response task 1",
+                    "completed": True,
+                    "completed_by": self.user_id,
+                    "completed_at": datetime.now(timezone.utc).isoformat()
+                },
+                {
+                    "id": "complete-2", 
+                    "text": "Complete response task 2",
+                    "completed": False
+                }
+            ]
+        }
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", complete_update, expect_status=200
+        )
+        
+        if success:
+            # Check that response includes all essential work order fields
+            required_fields = ["id", "wo_id", "title", "type", "priority", "status", 
+                             "description", "checklist", "created_at", "updated_at"]
+            missing_fields = [field for field in required_fields if field not in response]
+            
+            # Check checklist structure in response
+            response_checklist = response.get("checklist", [])
+            checklist_complete = all(
+                "id" in item and "text" in item and "completed" in item
+                for item in response_checklist
+            )
+            
+            # Check completed items have metadata
+            completed_items = [item for item in response_checklist if item.get("completed")]
+            metadata_complete = all(
+                item.get("completed_by") and item.get("completed_at")
+                for item in completed_items
+            )
+            
+            if not missing_fields and checklist_complete and metadata_complete:
+                self.log_result("Complete API Response", True, 
+                              "PUT response includes complete work order object with proper checklist structure")
+            else:
+                issues = []
+                if missing_fields:
+                    issues.append(f"Missing fields: {missing_fields}")
+                if not checklist_complete:
+                    issues.append("Incomplete checklist structure")
+                if not metadata_complete:
+                    issues.append("Missing completion metadata")
+                    
+                self.log_result("Complete API Response", False, 
+                              f"Response issues: {'; '.join(issues)}")
+        else:
+            self.log_result("Complete API Response", False, 
+                          f"Failed to get complete response: {response}", status)
+            
+        # Test 4: Cross-page synchronization data availability
+        print("\n--- Test 4: Cross-page synchronization data ---")
+        
+        # Verify that the response data can be used for frontend state updates
+        if success:
+            # Check that response contains authoritative data for state synchronization
+            sync_data_complete = (
+                response.get("id") and 
+                response.get("title") and
+                response.get("checklist") is not None and
+                response.get("updated_at")
+            )
+            
+            if sync_data_complete:
+                self.log_result("Cross-page Sync Data", True, 
+                              "Response contains authoritative data for frontend state synchronization")
+            else:
+                self.log_result("Cross-page Sync Data", False, 
+                              "Response missing data needed for state synchronization")
+        
+        # Test 5: Checklist data structure preservation
+        print("\n--- Test 5: Checklist data structure preservation ---")
+        
+        # Test with complex checklist structure
+        complex_checklist = [
+            {
+                "id": "preserve-1",
+                "text": "Task with special chars: @#$%^&*()",
+                "completed": False
+            },
+            {
+                "id": "preserve-2",
+                "text": "Task with unicode: 测试任务 🔧",
+                "completed": True,
+                "completed_by": self.user_id,
+                "completed_at": datetime.now(timezone.utc).isoformat()
+            },
+            {
+                "id": "preserve-3",
+                "text": "Very long task description that might test field length limits and data preservation across database operations and API responses",
+                "completed": False
+            }
+        ]
+        
+        success, response, status = await self.make_request(
+            "PUT", f"/work-orders/{work_order_id}", {"checklist": complex_checklist}, expect_status=200
+        )
+        
+        if success:
+            preserved_checklist = response.get("checklist", [])
+            
+            # Verify all items preserved correctly
+            preservation_success = True
+            for original_item in complex_checklist:
+                preserved_item = next(
+                    (item for item in preserved_checklist if item.get("id") == original_item["id"]), 
+                    None
+                )
+                
+                if not preserved_item:
+                    preservation_success = False
+                    break
+                    
+                # Check text preservation
+                if preserved_item.get("text") != original_item.get("text"):
+                    preservation_success = False
+                    break
+                    
+                # Check completion status
+                if preserved_item.get("completed") != original_item.get("completed"):
+                    preservation_success = False
+                    break
+                    
+            if preservation_success:
+                self.log_result("Checklist Data Structure Preservation", True, 
+                              "Complex checklist data structure preserved correctly")
+            else:
+                self.log_result("Checklist Data Structure Preservation", False, 
+                              "Issues with checklist data preservation")
+        else:
+            self.log_result("Checklist Data Structure Preservation", False, 
+                          f"Failed to test preservation: {response}", status)
+            
+        # Test 6: Edge cases for integrated save
+        print("\n--- Test 6: Edge cases ---")
+        
+        edge_cases = [
+            {
+                "name": "Empty checklist with work order update",
+                "data": {"title": "Empty checklist test", "checklist": []}
+            },
+            {
+                "name": "Large checklist (10 items)",
+                "data": {
+                    "title": "Large checklist test",
+                    "checklist": [
+                        {"id": f"large-{i}", "text": f"Large checklist item {i}", "completed": i % 3 == 0}
+                        for i in range(10)
+                    ]
+                }
+            },
+            {
+                "name": "Mixed completion states",
+                "data": {
+                    "checklist": [
+                        {"id": "mixed-1", "text": "Uncompleted", "completed": False},
+                        {"id": "mixed-2", "text": "Completed", "completed": True, 
+                         "completed_by": self.user_id, "completed_at": datetime.now(timezone.utc).isoformat()},
+                        {"id": "mixed-3", "text": "Uncompleted 2", "completed": False},
+                        {"id": "mixed-4", "text": "Completed 2", "completed": True,
+                         "completed_by": self.user_id, "completed_at": datetime.now(timezone.utc).isoformat()}
+                    ]
+                }
+            }
+        ]
+        
+        edge_case_success = True
+        for case in edge_cases:
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", case["data"], expect_status=200
+            )
+            
+            if success:
+                # Basic validation that update worked
+                if "checklist" in case["data"]:
+                    returned_checklist = response.get("checklist", [])
+                    expected_count = len(case["data"]["checklist"])
+                    if len(returned_checklist) != expected_count:
+                        edge_case_success = False
+                        self.log_result(f"Edge Case - {case['name']}", False, 
+                                      f"Checklist count mismatch: expected {expected_count}, got {len(returned_checklist)}")
+            else:
+                edge_case_success = False
+                self.log_result(f"Edge Case - {case['name']}", False, 
+                              f"Update failed: {response}", status)
+                
+        if edge_case_success:
+            self.log_result("Edge Cases", True, "All edge cases handled correctly")
+            
+        # Test 7: Backward compatibility
+        print("\n--- Test 7: Backward compatibility ---")
+        
+        # Test that existing work order update structure still works
+        traditional_update = {
+            "title": "Traditional Update Test",
+            "description": "Testing backward compatibility",
+            "priority": "Medium"
+            # Note: No checklist field - should not affect existing checklist
+        }
+        
+        # Get current checklist before update
+        success, pre_response, status = await self.make_request(
+            "GET", f"/work-orders/{work_order_id}", expect_status=200
+        )
+        
+        if success:
+            pre_checklist = pre_response.get("checklist", [])
+            pre_checklist_count = len(pre_checklist)
+            
+            # Apply traditional update
+            success, response, status = await self.make_request(
+                "PUT", f"/work-orders/{work_order_id}", traditional_update, expect_status=200
+            )
+            
+            if success:
+                post_checklist = response.get("checklist", [])
+                post_checklist_count = len(post_checklist)
+                
+                # Verify work order fields updated but checklist preserved
+                title_updated = response.get("title") == "Traditional Update Test"
+                checklist_preserved = post_checklist_count == pre_checklist_count
+                
+                if title_updated and checklist_preserved:
+                    self.log_result("Backward Compatibility", True, 
+                                  "Traditional work order updates work without affecting checklist")
+                else:
+                    self.log_result("Backward Compatibility", False, 
+                                  f"Compatibility issues - Title updated: {title_updated}, Checklist preserved: {checklist_preserved}")
+            else:
+                self.log_result("Backward Compatibility", False, 
+                              f"Traditional update failed: {response}", status)
+        else:
+            self.log_result("Backward Compatibility", False, 
+                          "Failed to get pre-update state")
+
     async def run_all_tests(self):
         """Run all backend tests focusing on Daily Tasks and Maintenance Work Orders API fixes"""
         print("🚀 DAILY TASKS & MAINTENANCE WORK ORDERS API FIXES TESTING")
