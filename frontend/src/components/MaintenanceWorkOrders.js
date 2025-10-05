@@ -45,6 +45,15 @@ function MaintenanceWorkOrders({ user }) {
 
   const API = process.env.REACT_APP_BACKEND_URL;
 
+  // Save maintenance tasks to localStorage whenever they change
+  useEffect(() => {
+    try {
+      localStorage.setItem('equiptrack:maintenanceTasks', JSON.stringify(sampleMaintenanceTasks));
+    } catch (error) {
+      console.error('Failed to save maintenance tasks to localStorage:', error);
+    }
+  }, [sampleMaintenanceTasks]);
+
   const maintenanceTypes = [
     {
       id: 'daily',
