@@ -81,6 +81,9 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
     // Simple timeout to simulate save
     setTimeout(() => {
       try {
+        // Clear localStorage draft after successful save
+        localStorage.removeItem(cacheKey);
+        
         setEditMode(false);
         
         if (onUpdate) {
