@@ -545,17 +545,6 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrint}
-                className="text-blue-600 border-blue-200 hover:bg-blue-50"
-                data-testid="print-maintenance-task"
-              >
-                <Printer className="w-4 h-4 mr-2" />
-                Print
-              </Button>
-              
               {!editMode && (
                 <Button
                   variant="outline"
@@ -589,6 +578,17 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
                   )}
                 </Button>
               )}
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrint}
+                className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                data-testid="print-maintenance-task"
+              >
+                <Printer className="w-4 h-4 mr-2" />
+                Print
+              </Button>
               
               <Button
                 variant="ghost"
