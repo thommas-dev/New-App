@@ -2192,10 +2192,11 @@ class BackendTester:
             # Authentication setup
             await self.test_user_registration_with_trial()
             
-            # MAIN FOCUS: Daily Tasks and Maintenance Work Orders API Fixes
-            await self.test_daily_tasks_and_maintenance_work_orders_api_fixes()
+            # MAIN FOCUS: Integrated Save Functionality Testing
+            await self.test_integrated_save_functionality()
             
             # Additional focused tests
+            await self.test_daily_tasks_and_maintenance_work_orders_api_fixes()
             await self.test_enhanced_checklist_persistence_with_abortcontroller()
             await self.test_checklist_save_reopen_cycle()
             await self.test_work_order_checklist_update()
