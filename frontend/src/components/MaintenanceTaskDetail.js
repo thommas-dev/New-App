@@ -768,6 +768,7 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
                         checked={item.completed}
                         onCheckedChange={(checked) => handleChecklistToggle(item.id, checked)}
                         className="mt-0.5"
+                        disabled={!editMode}
                         data-testid={`maintenance-checklist-item-${index}`}
                       />
                       <div className="flex-1">
