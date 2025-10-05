@@ -22,6 +22,7 @@ function DailyTasks({ user }) {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
   const [workOrders, setWorkOrders] = useState([]);
+  const [maintenanceTasks, setMaintenanceTasks] = useState({ daily: [], weekly: [], monthly: [] });
   const [loading, setLoading] = useState(true);
 
   const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
