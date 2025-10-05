@@ -72,52 +72,11 @@ function DailyTasks({ user }) {
     };
   }, [API]);
 
-  // Filter work orders for today's tasks and add sample maintenance tasks
-  const todaysTasks = [
-    ...workOrders.filter(wo => {
-      // Show work orders that are not completed
-      return wo.status !== 'Completed';
-    }),
-    // Add some sample maintenance tasks
-    {
-      id: 'maintenance-1',
-      title: 'Oil Level Check - CNC Machine 01',
-      type: 'maintenance',
-      scheduledTime: '09:00',
-      department: 'Production',
-      machine: 'CNC Machine 01',
-      assignee: 'John Smith',
-      priority: 'High',
-      status: 'pending',
-      overdue: false,
-      frequency: 'Daily',
-      notes: 'Check hydraulic oil levels and record readings. Top up if below minimum line.',
-      safety_notes: 'Ensure machine is powered off before checking oil levels.',
-      checklist: [
-        { id: '1-1', text: 'Check oil level', completed: false, created_by: 'System', created_at: new Date().toISOString() },
-        { id: '1-2', text: 'Record readings', completed: false, created_by: 'System', created_at: new Date().toISOString() },
-        { id: '1-3', text: 'Top up if needed', completed: false, created_by: 'System', created_at: new Date().toISOString() }
-      ]
-    },
-    {
-      id: 'maintenance-2',
-      title: 'Conveyor Belt Inspection',
-      type: 'maintenance',
-      scheduledTime: '10:30',
-      department: 'Production',
-      machine: 'Conveyor Belt B',
-      assignee: 'Sarah Davis',
-      priority: 'Medium',
-      status: 'completed',
-      overdue: false,
-      frequency: 'Weekly',
-      checklist: [
-        { id: '3-1', text: 'Visual inspection', completed: true },
-        { id: '3-2', text: 'Check tension', completed: true },
-        { id: '3-3', text: 'Lubricate bearings', completed: true }
-      ]
-    }
-  ];
+  // Filter work orders for today's tasks (only real work orders, no sample data)
+  const todaysTasks = workOrders.filter(wo => {
+    // Show work orders that are not completed
+    return wo.status !== 'Completed';
+  });
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
