@@ -883,28 +883,7 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
                   ))}
                 </div>
 
-                {totalItems > 0 && (
-                  <div className="flex justify-end pt-4 border-t">
-                    <Button
-                      onClick={saveChecklistChanges}
-                      disabled={loading || isChecklistSaving}
-                      className="bg-green-600 hover:bg-green-700 text-white"
-                      data-testid="save-work-order-checklist"
-                    >
-                      {isChecklistSaving ? (
-                        <div className="flex items-center space-x-2">
-                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                          <span>Saving...</span>
-                        </div>
-                      ) : (
-                        <>
-                          <Save className="w-4 h-4 mr-2" />
-                          Save Checklist
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                )}
+                {/* Standalone Save Checklist button removed - saving integrated with main Edit/Save button */}
 
                 {totalItems === 0 && (
                   <div className="text-center py-8 text-gray-500">
