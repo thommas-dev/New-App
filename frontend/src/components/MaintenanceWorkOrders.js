@@ -319,11 +319,18 @@ function MaintenanceWorkOrders({ user }) {
               </Card>
             ))}
             
-            {sampleMaintenanceTasks[activeView]?.length === 0 && (
+            {(!sampleMaintenanceTasks[activeView] || sampleMaintenanceTasks[activeView].length === 0) && (
               <div className="text-center py-12 text-gray-500">
                 <Settings className="w-16 h-16 mx-auto mb-4 text-gray-300" />
                 <p className="text-lg font-medium mb-2">No {activeView} maintenance tasks yet</p>
-                <p>Start by creating your first {activeView} maintenance schedule.</p>
+                <p className="mb-4">Start by creating your first {activeView} maintenance schedule.</p>
+                <Button
+                  onClick={() => handleCreateMaintenance(activeView)}
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create First {activeView.charAt(0).toUpperCase() + activeView.slice(1)} Task
+                </Button>
               </div>
             )}
           </div>
