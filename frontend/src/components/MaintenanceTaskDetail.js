@@ -87,7 +87,7 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
       abortRef.current = new AbortController();
 
       // Check if this is a real work order (has wo_id) or sample maintenance task
-      if (task.wo_id || task.id) {
+      if (task.wo_id) {
         // This is a real work order - save to backend including checklist
         const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
         const API = `${BACKEND_URL}/api`;
@@ -133,7 +133,7 @@ function MaintenanceTaskDetail({ task, onClose, onUpdate, user }) {
         // Clear draft since we've saved it
         localStorage.removeItem(cacheKey);
         
-        toast.success('Sample maintenance task updated locally!');
+        toast.success('Maintenance task updated successfully!');
       }
       
       setEditMode(false);
