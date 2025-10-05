@@ -106,28 +106,63 @@ function WorkOrderDetail({ workOrder, onClose, onUpdate, user }) {
   const handleSave = async () => {
     setLoading(true);
     try {
+      // Cancel any previous save request
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+      
+      // Create new AbortController for this request
+      abortRef.current = new AbortController();
+
       const updateData = {
         ...formData,
         assignee: formData.assignee === 'none' ? null : formData.assignee,
         estimated_duration: formData.estimated_duration ? parseInt(formData.estimated_duration) : null,
         due_date: formData.due_date || null,
         scheduled_start: formData.scheduled_start || null,
-        scheduled_end: formData.scheduled_end || null
+        scheduled_end: formData.scheduled_end || null,
+        checklist: checklist  // Include checklist in the save
       };
 
-      const response = await axios.put(`${API}/work-orders/${workOrder.id}`, updateData);
+      const response = await axios.put(`${API}/work-orders/${workOrder.id}`, updateData, {
+        signal: abortRef.current.signal
+      });
       
-      toast.success('Work order updated successfully!');
+      // Use authoritative data from backend response
+      const savedData = response.data;
+      if (savedData.checklist) {
+        setChecklist(savedData.checklist);
+      }
+      
+      // Clear localStorage draft after successful save
+      localStorage.removeItem(cacheKey);
+      
+      // Trigger cross-page synchronization with authoritative data
+      const updateEvent = new CustomEvent('workOrderUpdated', {
+        detail: { 
+          workOrderId: workOrder.id, 
+          checklist: savedData.checklist || checklist 
+        }
+      });
+      window.dispatchEvent(updateEvent);
+      
+      toast.success('Work order and checklist updated successfully!');
       setEditMode(false);
       
       if (onUpdate) {
-        onUpdate(response.data);
+        onUpdate(savedData);
       }
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Save request was aborted');
+        return;
+      }
+      
       const message = error.response?.data?.detail || 'Failed to update work order';
       toast.error(message);
     } finally {
       setLoading(false);
+      abortRef.current = null;
     }
   };
 
