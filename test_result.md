@@ -309,11 +309,11 @@
 
   - task: "Enhanced checklist persistence with AbortController"
     implemented: true
-    working: true
+    working: false
     file: "WorkOrderDetail.js, MaintenanceTaskDetail.js, DailyTasks.js, MaintenanceWorkOrders.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
