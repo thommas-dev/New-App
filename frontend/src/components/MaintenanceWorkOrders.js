@@ -21,6 +21,11 @@ function MaintenanceWorkOrders({ user }) {
   const [showTaskForm, setShowTaskForm] = useState(false);
   const [maintenanceTasks, setMaintenanceTasks] = useState(null);
   const [workOrders, setWorkOrders] = useState([]);
+  const [sampleMaintenanceTasks, setSampleMaintenanceTasks] = useState({
+    daily: [],
+    weekly: [],
+    monthly: []
+  });
 
   const API = process.env.REACT_APP_BACKEND_URL;
 
@@ -56,12 +61,6 @@ function MaintenanceWorkOrders({ user }) {
       borderColor: 'border-purple-200'
     }
   ];
-
-  const [sampleMaintenanceTasks, setSampleMaintenanceTasks] = useState({
-    daily: [],
-    weekly: [],
-    monthly: []
-  });
 
   const handleCreateMaintenance = (type) => {
     setMaintenanceTasks({ type, frequency: type.charAt(0).toUpperCase() + type.slice(1) });
